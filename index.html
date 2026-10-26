@@ -66,7 +66,7 @@ header{
 header::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,167,51,.05),transparent);animation:sheen 4s ease-in-out infinite;pointer-events:none}
 @keyframes sheen{0%,100%{opacity:0;transform:translateX(-100%)}50%{opacity:1;transform:translateX(100%)}}
 .side-col{width:290px;max-width:100%;display:flex;flex-direction:column;gap:10px;align-self:stretch}
-.mascot{margin-top:auto;display:flex;flex-direction:row-reverse;align-items:center;justify-content:flex-start;gap:8px;pointer-events:none;animation:vbFloat 3.4s ease-in-out infinite;padding-right:6px}
+.mascot{margin-top:auto;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px;pointer-events:none;animation:vbFloat 3.4s ease-in-out infinite;padding-left:6px}
 .mascot #vb{pointer-events:auto}
 @keyframes vbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 
@@ -176,8 +176,7 @@ hr{border:none;border-top:1px solid rgba(236,30,121,.3);margin:8px 0}
   .bubble{font-size:.7rem;max-width:120px;min-width:80px}
   .screen{padding:10px;gap:12px}
 }
-.mascot .bubble{transform:translateX(6px) scale(.92)}.mascot .bubble.show{transform:none}
-.mascot .bubble::before{left:auto;right:-11px;border-right:none;border-left:11px solid var(--magenta)}
+.mascot .bubble{transform:translateX(-6px) scale(.92)}.mascot .bubble.show{transform:none}
 .name-in{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:1.2rem;text-align:center;width:min(100%,240px);padding:10px 12px;border-radius:12px;border:3px solid var(--gold);background:#12062b;color:#fff8e0;outline:none}
 .name-in:focus{box-shadow:0 0 0 3px rgba(236,30,121,.5)}
 #greet{cursor:pointer}
@@ -197,6 +196,21 @@ hr{border:none;border-top:1px solid rgba(236,30,121,.3);margin:8px 0}
 .sum b{color:var(--gold);float:right}
 .medal{font-size:3.2rem;line-height:1;filter:drop-shadow(0 0 14px rgba(255,200,60,.7));animation:vbFloat 2.4s ease-in-out infinite}
 .medal-t{font-family:'Baloo 2',sans-serif;font-weight:800;color:#fff8e0;font-size:1.05rem}
+
+/* ── ajuste automático ao ecrã ── */
+html,body{min-height:100%}
+.game-col{width:calc(var(--bw,360px) + 22px);max-width:100%}
+.frame{width:100%}
+.pad button{height:clamp(40px,calc(var(--bw,300px) * .2),80px)!important;font-size:clamp(1.1rem,calc(var(--bw,300px) * .06),1.8rem)}
+@media (min-width:760px){ .screen{flex-wrap:nowrap;align-items:flex-start} }
+@media (max-height:520px){
+  #app{padding:6px;gap:6px} header{padding:4px 12px} #greet,.sub{display:none}
+  h1{font-size:1.15rem} #vb{width:56px;height:56px} .screen{padding:8px}
+}
+.small-board #quiz,.small-board #overlay{overflow:auto;padding:8px;gap:5px}
+.small-board #ovTitle{font-size:1.3rem} .small-board #ovText,.small-board #qFb{font-size:.72rem}
+.small-board #qText{font-size:.85rem} .small-board #qOpts .btn{font-size:.74rem;padding:6px 8px}
+#quiz,#overlay{overflow:auto}
 </style>
 </head>
 <body>
@@ -505,7 +519,7 @@ try{ modeExtra=localStorage.getItem('vb_tetris_modo')==='extra'; }catch(e){}
 const bestKey=()=>(modeExtra?'tetris_best_score_extra':'tetris_best_score_v3')+(diff==='normal'?'':'_'+diff);
 
 const canvas=$('board'), ctx=canvas.getContext('2d');
-const dpr=Math.min(window.devicePixelRatio||1,2);
+const dpr=Math.min(Math.max(window.devicePixelRatio||1,1.5),2);
 canvas.width=W*dpr; canvas.height=H*dpr;
 const nextCv=$('next'), nextCtx=nextCv.getContext('2d');
 const holdCv=$('hold'), holdCtx=holdCv.getContext('2d');
@@ -820,7 +834,7 @@ function drawNext(){
 
 /* ═══════════════ PERGUNTAS DE CIBERSEGURANÇA ═══════════════ */
 const QUIZ=[
- {q:'Recebes um email a pedir a tua palavra-passe com urgência. O que fazes?',o:['Respondo logo com a palavra-passe','Não respondo e aviso um adulto ou o professor','Reencaminho a todos os amigos'],a:1,e:'Ninguém de confiança pede a tua palavra-passe por email.'},
+ {q:'Recebes um e-mail a pedir a tua palavra-passe com urgência. O que fazes?',o:['Respondo logo com a palavra-passe','Não respondo e aviso um adulto ou o professor','Reencaminho a todos os amigos'],a:1,e:'Ninguém de confiança pede a tua palavra-passe por e-mail.'},
  {q:'Qual é a palavra-passe mais segura?',o:['123456','O meu nome','Gato!Azul_27Sol'],a:2,e:'Longa, com letras, números e símbolos, e difícil de adivinhar.'},
  {q:'Podes partilhar a tua palavra-passe com os amigos?',o:['Sim, se forem muito amigos','Não, é secreta','Só nas redes sociais'],a:1,e:'A palavra-passe é só tua. Não a partilhes.'},
  {q:'O que é o phishing?',o:['Um jogo de pesca','Uma tentativa de enganar para roubar dados','Um tipo de antivírus'],a:1,e:'São mensagens falsas que tentam roubar os teus dados.'},
@@ -831,13 +845,13 @@ const QUIZ=[
  {q:'Quando deves atualizar o sistema e as aplicações?',o:['Nunca','Sempre que há atualizações','Só quando avaria'],a:1,e:'As atualizações corrigem falhas de segurança.'},
  {q:'O que é a autenticação de dois fatores?',o:['Ter duas palavras-passe iguais','Uma segunda confirmação para além da palavra-passe','Ter dois utilizadores'],a:1,e:'Mesmo que roubem a palavra-passe, falta a segunda confirmação.'},
  {q:'Podes publicar a tua morada e a tua escola nas redes?',o:['Sim','Não, são dados pessoais','Só à sexta-feira'],a:1,e:'Dados pessoais devem ficar privados.'},
- {q:'Uma mensagem diz que ganhaste um prémio e pede que cliques num link. Provavelmente é…',o:['Sorte','Uma burla','Um presente'],a:1,e:'Prémios que não pediste são quase sempre burlas.'},
+ {q:'Uma mensagem diz que ganhaste um prémio e pede que cliques numa ligação. Provavelmente é…',o:['Sorte','Uma burla','Um presente'],a:1,e:'Prémios que não pediste são quase sempre burlas.'},
  {q:'Numa rede Wi-Fi pública e aberta, o que deves evitar?',o:['Ver vídeos','Pagamentos e iniciar sessões importantes','Nada, é tudo seguro'],a:1,e:'Redes abertas podem ser espiadas.'},
- {q:'Vês um colega a ser alvo de cyberbullying. O que fazes?',o:['Partilho a mensagem','Não alinho e conto a um adulto de confiança','Rio-me'],a:1,e:'Ajudar é não alinhar e pedir ajuda.'},
+ {q:'Vês um colega a ser alvo de ciberbullying. O que fazes?',o:['Partilho a mensagem','Não alinho e conto a um adulto de confiança','Rio-me'],a:1,e:'Ajudar é não alinhar e pedir ajuda.'},
  {q:'Usar a mesma palavra-passe em todas as contas é…',o:['Uma boa ideia','Arriscado','Obrigatório'],a:1,e:'Se uma conta for roubada, as outras ficam em risco.'},
  {q:'Quem deve saber a tua palavra-passe?',o:['Só tu (e os teus pais, se necessário)','Toda a turma','Quem perguntar'],a:0,e:'Mantém-na secreta.'},
- {q:'Um email com erros de escrita e um remetente estranho é sinal de…',o:['Phishing','Boa educação','Publicidade segura'],a:0,e:'Desconfia e não cliques em nada.'},
- {q:'Antes de instalar uma aplicação, deves…',o:['Descarregá-la de uma loja oficial','Usar o primeiro link que aparece','Descarregar de qualquer site'],a:0,e:'As lojas oficiais verificam as aplicações.'}
+ {q:'Um e-mail com erros de escrita e um remetente estranho é sinal de…',o:['Phishing','Boa educação','Publicidade segura'],a:0,e:'Desconfia e não cliques em nada.'},
+ {q:'Antes de instalar uma aplicação, deves…',o:['Descarregá-la de uma loja oficial','Usar o primeiro endereço que aparece','Descarregar de qualquer site'],a:0,e:'As lojas oficiais verificam as aplicações.'}
 ];
 let qUsed=[], qCur=null, qAnswered=false;
 const qBox=$('quiz'), qNext=$('qNext');
@@ -1019,6 +1033,34 @@ if(!playerName) askName(); else if(!helpSeen()) showHelp(); if(playerName) setTi
 soundBtn.onclick=()=>{ soundOn=!soundOn; soundBtn.textContent=soundOn?'🔊 Som':'🔇 Sem som'; };
 ghostBtn.onclick=()=>{ showGhost=!showGhost; ghostBtn.textContent=showGhost?'👻 SOMBRA':'👻 SEM SOMBRA'; };
 document.addEventListener('visibilitychange',()=>{ if(document.hidden&&running&&!paused) togglePause(); });
+
+/* ═══════════════ AJUSTE AO ECRÃ ═══════════════ */
+const fitRoot=document.documentElement, fitCol=document.querySelector('.game-col'), fitFrame=document.querySelector('.frame');
+function fitBoard(){
+  const vv=window.visualViewport, vw=vv?vv.width:window.innerWidth, vh=vv?vv.height:window.innerHeight;
+  const sideBySide=vw>=760;
+  const appEl=$('app'), cs=getComputedStyle(appEl), pad=parseFloat(cs.paddingLeft)||0;
+  const screenEl=document.querySelector('.screen'), sp=parseFloat(getComputedStyle(screenEl).paddingLeft)||0;
+  const chrome=22;                                   // moldura + bordas à volta do canvas
+  let availW=Math.min(vw,appEl.parentElement.clientWidth||vw, 1000) - 2*pad - 2*sp - 8 - chrome;
+  if(sideBySide) availW-=290+20;                     // painel lateral + espaço
+  const top=fitCol.getBoundingClientRect().top+window.scrollY;
+  const other=fitCol.offsetHeight-canvas.offsetHeight;   // moldura + botões de toque
+  const availH=vh-top-other-(sp+pad+8);
+  let bw=Math.min(availW, availH*COLS/ROWS, 560);
+  bw=Math.max(110, Math.floor(bw));
+  fitRoot.style.setProperty('--bw', bw+'px');
+  fitCol.classList.toggle('small-board', bw<260);
+  fitFrame.classList.toggle('small-board', bw<260);
+}
+let fitRaf=0;
+const scheduleFit=()=>{ cancelAnimationFrame(fitRaf); fitRaf=requestAnimationFrame(fitBoard); };
+window.addEventListener('resize',scheduleFit);
+window.addEventListener('orientationchange',()=>setTimeout(scheduleFit,250));
+if(window.visualViewport) window.visualViewport.addEventListener('resize',scheduleFit);
+if(window.ResizeObserver) new ResizeObserver(scheduleFit).observe(document.querySelector('header'));
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(scheduleFit);
+fitBoard();
 
 requestAnimationFrame(frame);
 if('serviceWorker' in navigator && /^https?:/.test(location.protocol)){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
