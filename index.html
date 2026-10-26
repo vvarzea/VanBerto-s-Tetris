@@ -49,7 +49,7 @@ body::before{
     radial-gradient(1px 1px at 5% 50%,rgba(255,255,255,.3) 0%,transparent 100%),
     radial-gradient(1.5px 1.5px at 62% 88%,rgba(56,189,248,.4) 0%,transparent 100%);
 }
-h1,h2,h3{font-family:'Fredoka One','Baloo 2',cursive;font-weight:400;margin:0}
+h1,h2,h3{font-family:'Fredoka One','Baloo 2',system-ui,sans-serif;font-weight:400;margin:0}
 button{font-family:'Baloo 2',sans-serif}
 .hidden{display:none!important}
 
@@ -77,7 +77,7 @@ header::after{content:'';position:absolute;inset:0;background:linear-gradient(90
   background:linear-gradient(135deg,#2a0a4e,#1a0835);
   border:2.5px solid var(--magenta); outline:1.5px solid rgba(255,167,51,.28); outline-offset:-3px;
   border-radius:16px; padding:6px 12px; box-shadow:3px 3px 0 rgba(5,2,15,.8);
-  font-family:'Fredoka One',cursive; font-size:.8rem; color:#fff8e0;
+  font-family:'Fredoka One','Baloo 2',system-ui,sans-serif; font-size:.8rem; color:#fff8e0;
   min-width:96px; max-width:170px; text-align:center; position:relative;
   opacity:0; transform:translateX(-6px) scale(.92);
   transition:opacity .3s,transform .3s cubic-bezier(.34,1.56,.64,1);
@@ -93,7 +93,7 @@ h1{font-size:clamp(1.5rem,5vw,2.2rem);letter-spacing:.02em;display:flex;align-it
 @keyframes titleGradient{0%{background-position:0% center}100%{background-position:200% center}}
 .sub{font-size:.82rem;color:var(--pink);font-style:italic;margin-top:2px}
 .sub strong{color:var(--gold);font-style:normal}
-#greet{font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--gold);margin-top:2px}
+#greet{font-family:'Fredoka One','Baloo 2',system-ui,sans-serif;font-size:.85rem;color:var(--gold);margin-top:2px}
 .hdr-btns{display:flex;gap:6px;position:relative;z-index:1}
 
 .btn{
@@ -135,7 +135,7 @@ h1{font-size:clamp(1.5rem,5vw,2.2rem);letter-spacing:.02em;display:flex;align-it
   display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:8px; padding:16px;
   backdrop-filter:blur(2px);
 }
-#ovTitle{font-family:'Fredoka One',cursive;font-size:1.9rem;color:var(--gold);text-shadow:0 0 18px rgba(255,167,51,.45)}
+#ovTitle{font-family:'Fredoka One','Baloo 2',system-ui,sans-serif;font-size:1.9rem;color:var(--gold);text-shadow:0 0 18px rgba(255,167,51,.45)}
 #ovText{color:var(--pink);font-size:.88rem;line-height:1.5}
 #ovBtn{margin-top:6px;font-size:1rem;padding:10px 22px}
 
@@ -165,12 +165,12 @@ aside{
 .info{background:rgba(10,5,32,.7);border:1px solid rgba(236,30,121,.35);border-radius:12px;padding:10px;margin-top:10px}
 #next{display:block;margin:6px auto 0;background:#08041a;border-radius:10px;border:1px solid rgba(236,30,121,.4)}
 .stat{display:flex;justify-content:space-between;align-items:baseline;margin:5px 0;font-weight:700;color:var(--peach)}
-.stat strong{font-family:'Fredoka One',cursive;font-weight:400;font-size:1.1rem;color:var(--gold)}
+.stat strong{font-family:'Fredoka One','Baloo 2',system-ui,sans-serif;font-weight:400;font-size:1.1rem;color:var(--gold)}
 .pop{animation:statPop .35s ease}
 @keyframes statPop{50%{transform:scale(1.35);color:#ec1e79}}
 hr{border:none;border-top:1px solid rgba(236,30,121,.3);margin:8px 0}
 .hint{margin-top:8px;font-size:.74rem;color:var(--pink);line-height:1.5;font-style:italic}
-#app-footer{text-align:center;padding:8px 0 4px;font-family:'Fredoka One',cursive;font-size:.72rem;color:rgba(255,179,209,.5);letter-spacing:.5px;border-top:1px solid rgba(236,30,121,.12)}
+#app-footer{text-align:center;padding:8px 0 4px;font-family:'Fredoka One','Baloo 2',system-ui,sans-serif;font-size:.8rem;color:rgba(255,179,209,.85);letter-spacing:.5px;border-top:1px solid rgba(236,30,121,.12)}
 @media(max-width:560px){
   #app{padding:8px} header{padding:8px 12px} #vb{width:68px;height:68px}
   .bubble{font-size:.7rem;max-width:120px;min-width:80px}
@@ -184,6 +184,10 @@ hr{border:none;border-top:1px solid rgba(236,30,121,.3);margin:8px 0}
 .q-tag{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:.72rem;color:var(--gold);text-transform:uppercase;letter-spacing:.06em}
 #qText{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:1.08rem;color:#fff8e0;line-height:1.3}
 #qOpts{display:flex;flex-direction:column;gap:8px;width:100%}
+#qOpts .btn.sel{outline:3px solid var(--gold);outline-offset:2px}
+#qHint,.kbhint{font-family:'Baloo 2',system-ui,sans-serif;font-weight:700;font-size:.74rem;color:var(--pink);opacity:.95}
+.kbhint{margin-top:2px}
+@media (pointer:coarse){ #qHint,.kbhint{display:none} }
 #qOpts .btn{width:100%;text-align:left;justify-content:flex-start;font-size:.9rem;padding:10px 12px;white-space:normal;line-height:1.25}
 #qOpts .btn.ok{background:linear-gradient(180deg,#4ecb71,#00b894);color:#04210f;border-color:var(--gold)}
 #qOpts .btn.bad{background:linear-gradient(180deg,#ff6b6b,#c0392b);color:#fff;border-color:#ffb3b3}
@@ -235,11 +239,13 @@ html,body{min-height:100%}
           <div id="ovText">Completa linhas para ganhar pontos!<br>Toca no ecrã, usa os botões ou o teclado.</div>
           <input id="nameIn" class="name-in hidden" type="text" maxlength="16" placeholder="O teu nome" autocomplete="off" aria-label="O teu nome">
           <button class="btn go" id="ovBtn">▶ COMEÇAR</button>
+          <div class="kbhint">⌨️ Enter</div>
         </div>
         <div id="quiz" class="hidden" role="dialog" aria-live="polite">
           <div class="q-tag">🧠 Pergunta VanBerto's · +100 pontos</div>
           <div id="qText"></div>
           <div id="qOpts"></div>
+          <div id="qHint"></div>
           <div id="qFb"></div>
           <button class="btn go hidden" id="qNext">Continuar ▶</button>
         </div>
@@ -804,7 +810,7 @@ function render(){
   for(const q of pops){
     const k=q.t/1100, a=k<.7?1:1-(k-.7)/.3, sc=k<.15?.6+k/.15*.5:1.1-Math.min(k,1)*.1;
     ctx.save(); ctx.globalAlpha=a; ctx.translate(q.x,q.y-k*40); ctx.scale(sc,sc);
-    ctx.font=(q.big?'34px':'24px')+" 'Fredoka One','Baloo 2',cursive";
+    ctx.font=(q.big?'34px':'24px')+" 'Fredoka One','Baloo 2',system-ui,sans-serif";
     ctx.lineWidth=6; ctx.strokeStyle='#2a0a4e'; ctx.strokeText(q.txt,0,0);
     ctx.fillStyle=q.big?'#ffd93b':'#fff8e0'; ctx.fillText(q.txt,0,0);
     ctx.restore();
@@ -853,7 +859,7 @@ const QUIZ=[
  {q:'Um e-mail com erros de escrita e um remetente estranho é sinal de…',o:['Phishing','Boa educação','Publicidade segura'],a:0,e:'Desconfia e não cliques em nada.'},
  {q:'Antes de instalar uma aplicação, deves…',o:['Descarregá-la de uma loja oficial','Usar o primeiro endereço que aparece','Descarregar de qualquer site'],a:0,e:'As lojas oficiais verificam as aplicações.'}
 ];
-let qUsed=[], qCur=null, qAnswered=false;
+let qUsed=[], qCur=null, qAnswered=false, qSel=-1, qOpenedAt=0, qAnsweredAt=0;
 const qBox=$('quiz'), qNext=$('qNext');
 function openQuiz(){
   if(qUsed.length>=QUIZ.length) qUsed=[];
@@ -862,6 +868,9 @@ function openQuiz(){
   const it=QUIZ[i], order=it.o.map((_,k)=>k);
   for(let k=order.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [order[k],order[j]]=[order[j],order[k]]; }
   qCur={it,order}; qAnswered=false; quizOpen=true; paused=true;
+  qSel=-1; qOpenedAt=performance.now();
+  try{ if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); }catch(e){}   // nenhum botão com foco a "roubar" o Espaço/Enter
+  $('qHint').textContent='⌨️ Carrega 1, 2 ou 3 (ou A, B, C) — ou usa ↑ ↓ e Enter';
   $('qText').textContent=it.q; $('qFb').textContent=''; qNext.classList.add('hidden');
   const box=$('qOpts'); box.innerHTML='';
   order.forEach((k,n)=>{
@@ -872,7 +881,7 @@ function openQuiz(){
 }
 function answerQuiz(k){
   if(!qAnswered&&qCur){
-    qAnswered=true; const it=qCur.it, right=k===it.a; st.quizTotal++; if(right) st.quizRight++;
+    qAnswered=true; qAnsweredAt=performance.now(); const it=qCur.it, right=k===it.a; st.quizTotal++; if(right) st.quizRight++;
     [...$('qOpts').children].forEach(b=>{ const kk=Number(b.dataset.k); b.disabled=true; if(kk===it.a) b.classList.add('ok'); else if(kk===k) b.classList.add('bad'); });
     if(right){
       score+=100; bump(scoreEl); sfxLevel();
@@ -882,8 +891,15 @@ function answerQuiz(k){
       $('qFb').innerHTML='💡 <strong>Quase!</strong> '+it.e;
       vbSay('Agora já sabes! 💡',2400); vbSad();
     }
+    $('qHint').textContent='⌨️ Carrega Enter ou Espaço para continuar';
     qNext.classList.remove('hidden'); qNext.focus();
   }
+}
+function qSelect(n){
+  const bs=[...$('qOpts').children]; if(!bs.length) return;
+  qSel=(n+bs.length)%bs.length;
+  bs.forEach((b,i)=>b.classList.toggle('sel',i===qSel));
+  try{ ensureAudio(); beep(520,30,'square',0.03); }catch(e){}
 }
 function closeQuiz(){
   if(!quizOpen||!qAnswered) return;
@@ -909,7 +925,8 @@ function frame(t){
 }
 
 /* ═══════════════ OVERLAY E CONTROLOS ═══════════════ */
-function showOverlay(title,html,btn){ ovTitle.textContent=title; ovText.innerHTML=html; ovBtn.textContent=btn; overlay.classList.remove('hidden'); }
+let ovShownAt=0;
+function showOverlay(title,html,btn){ ovShownAt=performance.now(); ovTitle.textContent=title; ovText.innerHTML=html; ovBtn.textContent=btn; overlay.classList.remove('hidden'); }
 function hideOverlay(){ overlay.classList.add('hidden'); }
 
 function act(a){
@@ -945,11 +962,26 @@ $('pad').addEventListener('pointerdown',e=>{
 
 window.addEventListener('keydown',e=>{
   if(quizOpen){
-    if(!qAnswered&&['1','2','3'].includes(e.key)){ const n=Number(e.key)-1; if(qCur.order[n]!==undefined) answerQuiz(qCur.order[n]); }
-    else if(qAnswered&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); closeQuiz(); }
+    if(e.repeat||e.ctrlKey||e.metaKey||e.altKey) return;
+    const kq=e.key.toLowerCase();
+    if(!qAnswered){
+      const idx=Math.max(['1','2','3'].indexOf(kq), ['a','b','c'].indexOf(kq));   // 1/2/3 ou A/B/C
+      const ready=performance.now()-qOpenedAt>450;   // evita respostas sem querer (teclas de jogo ainda carregadas)
+      if(idx>=0&&idx<qCur.order.length){ e.preventDefault(); if(ready) answerQuiz(qCur.order[idx]); }
+      else if(kq==='arrowdown'||kq==='arrowright'){ e.preventDefault(); qSelect(qSel<0?0:qSel+1); }
+      else if(kq==='arrowup'||kq==='arrowleft'){ e.preventDefault(); qSelect(qSel<0?qCur.order.length-1:qSel-1); }
+      else if(kq==='enter'||kq===' '){ e.preventDefault(); if(ready&&qSel>=0) answerQuiz(qCur.order[qSel]); }
+    } else if(kq==='enter'||kq===' '){
+      e.preventDefault(); if(performance.now()-qAnsweredAt>350) closeQuiz();
+    }
     return;
   }
   if(nameMode) return;
+  if(!overlay.classList.contains('hidden')&&(e.key==='Enter'||e.key===' ')){   // avisos (começar, pausa, ajuda, fim): Enter/Espaço = botão
+    e.preventDefault();
+    if(!e.repeat&&performance.now()-ovShownAt>600) ovBtn.click();
+    return;
+  }
   const map={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'rotate',ArrowDown:'down',' ':'hard'};
   if(map[e.key]){
     e.preventDefault();
@@ -999,7 +1031,7 @@ function helpSeen(){ try{ return localStorage.getItem(LS_HELP)==='1'; }catch(e){
 function showStart(){ showOverlay('TETRIS','Completa linhas para ganhar pontos!<br>Toca no ecrã, usa os botões ou o teclado.','▶ COMEÇAR'); }
 function showHelp(){
   helpMode=true;
-  showOverlay('Como jogar','<div class="help"><div>👆 <b>Toque:</b> topo roda • lados movem • centro desce • duplo toque cai</div><div>⌨️ <b>Teclas:</b> ← → mover • ↑ rodar • ↓ descer • Espaço queda • P pausa</div><div>📦 <b>C</b> guarda a peça na reserva (1 vez por peça)</div><div>📏 Completa linhas para ganhar pontos</div><div>🔥 Linhas seguidas dão combos com bónus</div><div>🧠 Responde às perguntas (teclas 1, 2, 3) para ganhar pontos extra</div></div>','Percebi! ▶');
+  showOverlay('Como jogar','<div class="help"><div>👆 <b>Toque:</b> topo roda • lados movem • centro desce • duplo toque cai</div><div>⌨️ <b>Teclas:</b> ← → mover • ↑ rodar • ↓ descer • Espaço queda • P pausa • Enter ou Espaço continua</div><div>📦 <b>C</b> guarda a peça na reserva (1 vez por peça)</div><div>📏 Completa linhas para ganhar pontos</div><div>🔥 Linhas seguidas dão combos com bónus</div><div>🧠 Responde às perguntas com 1, 2, 3 (ou A, B, C, ou ↑ ↓ e Enter) para ganhar pontos extra</div></div>','Percebi! ▶');
 }
 function closeHelp(){
   helpMode=false; try{ localStorage.setItem(LS_HELP,'1'); }catch(e){}
