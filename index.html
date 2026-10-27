@@ -500,13 +500,35 @@ function beep(freq,dur,type,vol,slideTo,delay){
     o.connect(g); g.connect(audioCtx.destination); o.start(t0); o.stop(t1+0.02);
   }catch(e){}
 }
-function sfxLines(n){ const base=n>=4?[523,659,784,1047,1319]:[523,659,784]; base.forEach((f,i)=>beep(f,110,'triangle',0.07,f*1.04,i*0.09)); }
+function noiseBurst(dur,vol,f0,f1,delay){
+  if(!soundOn||!audioCtx) return;
+  try{
+    const t0=audioCtx.currentTime+(delay||0), len=Math.max(1,Math.floor(audioCtx.sampleRate*dur/1000));
+    const buf=audioCtx.createBuffer(1,len,audioCtx.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
+    const src=audioCtx.createBufferSource(); src.buffer=buf;
+    const f=audioCtx.createBiquadFilter(); f.type='bandpass'; f.Q.value=1.2;
+    f.frequency.setValueAtTime(f0,t0); f.frequency.exponentialRampToValueAtTime(f1,t0+dur/1000);
+    const g=audioCtx.createGain();
+    g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(vol,t0+dur/4000); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur/1000);
+    src.connect(f); f.connect(g); g.connect(audioCtx.destination); src.start(t0);
+  }catch(e){}
+}
+/* baque no impacto + "whoosh" que acompanha o feixe de luz + notas que sobem a cada combo */
+function sfxLines(n,cmb){
+  const r=Math.pow(2,Math.min(Math.max(cmb-1,0),8)/12), hold=(70+n*10)/1000;
+  beep(150,170,'sine',0.13,45,0);
+  noiseBurst(60,0.05,3000,900,0);
+  noiseBurst(300,0.06,600,5000,hold);
+  [1,1.25,1.5,2,2.5,3].slice(0,n+2).forEach((q,i)=>beep(523*r*q,120,'triangle',0.07,523*r*q*1.03,hold+i*0.07));
+  if(n>=4) [1047,1319,1568,2093].forEach((f,i)=>beep(f*r,160,'sine',0.045,null,hold+0.1+i*0.06));
+}
 function sfxLevel(){ [660,880,1100,1320].forEach((f,i)=>beep(f,120,'square',0.05,f*1.05,i*0.08)); }
 function sfxOver(){ [392,330,262,196].forEach((f,i)=>beep(f,220,'triangle',0.07,f*0.9,i*0.17)); }
 
 /* ═══════════════ JOGO ═══════════════ */
 const COLS=12, ROWS=22, CELL=30, W=COLS*CELL, H=ROWS*CELL;
-const POINTS_LEVEL=600, CLEAR_MS=460;
+const POINTS_LEVEL=600, CLEAR_MS=500;
 
 const COLORS={I:'#19d3ff',J:'#3b5bff',L:'#ff8a1f',O:'#ffe033',S:'#7ae83a',T:'#b44cff',Z:'#ff3b3b',U:'#ff4fd8',P:'#dfe6f5',I3:'#00b386'};
 const SHAPES={
@@ -539,7 +561,8 @@ try{ bestScore=Number(localStorage.getItem(bestKey()))||0; }catch(e){}
 bestEl.textContent=bestScore;
 
 let board=newBoard(), piece=null, queue=[], held=null, canHold=true, bag=[];
-let fallOff=Array(ROWS).fill(0);
+let fallOff=Array(ROWS).fill(0), fallV=Array(ROWS).fill(0), landSfx=false;
+const FALL_G=.00013, REDUCE=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 const st={maxCombo:0,quizRight:0,quizTotal:0,ms:0,pieces:0};
 let running=false, paused=false, clearing=null;
 let score=0, level=1, lines=0, dropInterval=720, acc=0, showGhost=true;
@@ -606,13 +629,21 @@ function lockPiece(){
   for(let y=0;y<ROWS;y++) if(board[y].every(c=>c)) rows.push(y);
   if(rows.length){ combo++; if(combo>st.maxCombo) st.maxCombo=combo; } else combo=0;
   if(rows.length){
-    clearing={rows,t:0};
-    vib(rows.length>=4?[40,30,40,30,90]:[25,30,25]);
-    rows.forEach(y=>{ for(let x=0;x<COLS;x++) burst((x+.5)*CELL,(y+.5)*CELL,board[y][x],3,4.2,60+x*18); });
-    const n=rows.length, cy=rows.reduce((a,b)=>a+b,0)/n*CELL+CELL/2;
+    const n=rows.length, hold=70+n*10;   /* "hit-stop": pausa curta com a linha toda branca */
+    clearing={rows,t:0,hold};
+    vib(n>=4?[40,30,40,30,90]:[25,30,25]);
+    const pn=n>=3?6:4;
+    rows.forEach(y=>{
+      for(let x=0;x<COLS;x++) burst((x+.5)*CELL,(y+.5)*CELL,board[y][x],pn,4.6,hold+x*16);
+      blooms.push({y:(y+.5)*CELL,t:0});
+    });
+    const cy=rows.reduce((a,b)=>a+b,0)/n*CELL+CELL/2;
     popText(n>=4?'TETRIS!':n===1?'Linha!':n+' linhas!',W/2,cy,n>=3);
-    if(n>=4) shake(10,260); else if(n>=2) shake(5,160);
-    sfxLines(rows.length);
+    if(!REDUCE){
+      wellFlash=[0,.14,.22,.32,.5][Math.min(n,4)];
+      if(n>=4) shake(12,300); else if(n>=2) shake(6,180); else shake(3,120);
+    }
+    sfxLines(n,combo);
     if(rows.length>=4){ vbSay('TETRIS! 🏆',2600); vbDance(4); }
     else { vbSay(rows.length===1?'Linha! 🎉':rows.length+' linhas! 🎉',2000); vbJump(); }
   } else spawnNext();
@@ -622,10 +653,11 @@ function finishClear(){
   const keep=[]; for(let y=0;y<ROWS;y++) if(!rows.includes(y)) keep.push(y);
   const nb=keep.map(y=>board[y]), off=keep.map(y=>rows.filter(r=>r>y).length);
   while(nb.length<ROWS){ nb.unshift(Array(COLS).fill(null)); off.unshift(0); }
-  board=nb; fallOff=off;
+  board=nb; fallOff=off; fallV=Array(ROWS).fill(0); landSfx=false;
   const n=rows.length;
   lines+=n;
-  score+=[0,120,300,520,800][Math.min(n,4)]+n*40;
+  const pts=[0,120,300,520,800][Math.min(n,4)]+n*40; score+=pts;
+  popText('+'+pts,W/2,rows.reduce((a,b)=>a+b,0)/n*CELL+CELL/2+(n>=3?40:32),false);
   if(combo>=2){
     const b=50*(combo-1); score+=b;
     popText('Combo x'+combo+'! +'+b,W/2,H*.26,true);
@@ -694,11 +726,11 @@ function drawBlock(c,x,y,s,hex,sc){
   c.beginPath(); c.arc(px+ps*.14,py+ps*.44,ps*.04,0,Math.PI*2); c.fill();
 }
 
-const parts=[], pops=[], flashes=[], trails=[];
-let shakeT=0, shakeA=0;
+const parts=[], pops=[], flashes=[], trails=[], blooms=[];
+let shakeT=0, shakeA=0, wellFlash=0;
 function burst(x,y,hex,n,pw,delay){
   const rgb=shades(hex).rgb;
-  for(let i=0;i<n&&parts.length<500;i++){
+  for(let i=0;i<n&&parts.length<900;i++){
     const a=Math.random()*Math.PI*2, v=(.4+Math.random())*pw;
     parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-pw*.5,life:0,max:520+Math.random()*420,
       s:2.5+Math.random()*4,rgb,star:Math.random()<.35,delay:delay||0,rot:Math.random()*6});
@@ -716,6 +748,8 @@ function stepFx(dt){
   for(let i=pops.length-1;i>=0;i--){ pops[i].t+=dt; if(pops[i].t>1100) pops.splice(i,1); }
   for(let i=flashes.length-1;i>=0;i--){ flashes[i].t+=dt; if(flashes[i].t>220) flashes.splice(i,1); }
   for(let i=trails.length-1;i>=0;i--){ trails[i].t+=dt; if(trails[i].t>260) trails.splice(i,1); }
+  for(let i=blooms.length-1;i>=0;i--){ blooms[i].t+=dt; if(blooms[i].t>460) blooms.splice(i,1); }
+  if(wellFlash>0){ wellFlash*=Math.exp(-dt/120); if(wellFlash<.005) wellFlash=0; }
   if(shakeT>0) shakeT-=dt;
 }
 
@@ -771,10 +805,37 @@ function render(){
     if(clearing&&clearing.rows.includes(y)){
       const p=Math.max(0,Math.min(1,clearing.t/CLEAR_MS*1.7-x/COLS*.7));
       if(p>=1) continue;
-      drawBlock(ctx,x*CELL,y*CELL,CELL,c,1-p*.5);
-      ctx.fillStyle='rgba(255,255,255,'+(p*.9)+')'; rrVan(ctx,x*CELL+2,y*CELL+2,CELL-4,CELL-4,7); ctx.fill();
+      /* fase 1: cresce e fica branco · fase 2: encolhe a brilhar e desaparece */
+      const up=p<.3, u=up?p/.3:(p-.3)/.7, sc=up?1+.2*u:1.2*(1-u*u);
+      ctx.save(); ctx.translate((x+.5)*CELL,(y+.5)*CELL);
+      ctx.shadowColor='rgba(255,255,255,.9)'; ctx.shadowBlur=up?14*u:14*(1-u);
+      ctx.globalAlpha=up?1:1-u*.5;
+      drawBlock(ctx,-CELL/2,-CELL/2,CELL,c,sc);
+      ctx.fillStyle='rgba(255,255,255,'+(up?.25+.7*u:.95*(1-u*.4))+')';
+      const s2=(CELL-4)*sc; rrVan(ctx,-s2/2,-s2/2,s2,s2,7*sc); ctx.fill();
+      ctx.restore();
     } else drawBlock(ctx,x*CELL,(y-fallOff[y])*CELL,CELL,c);
   }
+  // luz: relâmpago nas linhas completas, feixe que as varre e "bloom" a expandir
+  ctx.save(); ctx.globalCompositeOperation='lighter';
+  if(clearing){
+    const fl=clearing.hold>0?.8:Math.max(0,.8*(1-clearing.t/130)), bx=clearing.t/CLEAR_MS*(1.7/.7)*W;
+    for(const y of clearing.rows){
+      if(fl>0){ ctx.fillStyle='rgba(255,255,255,'+fl+')'; ctx.fillRect(0,y*CELL,W,CELL); }
+      if(clearing.hold<=0){
+        const g=ctx.createLinearGradient(bx-120,0,bx+20,0);
+        g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(.8,'rgba(255,255,255,.85)'); g.addColorStop(1,'rgba(255,255,255,0)');
+        ctx.fillStyle=g; ctx.fillRect(0,y*CELL-4,W,CELL+8);
+      }
+    }
+  }
+  for(const b of blooms){
+    const k=b.t/460, h=CELL*(1+k*3.2), a=.55*(1-k)*(1-k);
+    const g=ctx.createLinearGradient(0,b.y-h/2,0,b.y+h/2);
+    g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(.5,'rgba(255,255,255,'+a+')'); g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g; ctx.fillRect(0,b.y-h/2,W,h);
+  }
+  ctx.restore();
   // brilho ao encaixar
   for(const f of flashes){
     ctx.fillStyle='rgba(255,255,255,'+(.65*(1-f.t/220))+')';
@@ -805,6 +866,7 @@ function render(){
     else ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s);
     ctx.restore();
   }
+  if(wellFlash>0){ ctx.fillStyle='rgba(255,255,255,'+wellFlash+')'; ctx.fillRect(0,0,W,H); }
   // textos
   ctx.textAlign='center'; ctx.lineJoin='round';
   for(const q of pops){
@@ -914,10 +976,18 @@ function frame(t){
   stepTheme(dt);
   if(!paused) stepFx(dt);
   if(piece){ const k1=1-Math.exp(-dt/42); piece.vx+=(piece.x-piece.vx)*k1; piece.vy+=(piece.y-piece.vy)*k1; if(Math.abs(piece.x-piece.vx)<.01) piece.vx=piece.x; if(Math.abs(piece.y-piece.vy)<.01) piece.vy=piece.y; }
-  for(let y=0;y<ROWS;y++) if(fallOff[y]>0){ fallOff[y]*=Math.exp(-dt/95); if(fallOff[y]<.02) fallOff[y]=0; }
+  /* as linhas de cima caem com gravidade, batem no monte e ressaltam um pouco */
+  for(let y=0;y<ROWS;y++) if(fallOff[y]>0||fallV[y]!==0){
+    fallV[y]+=FALL_G*dt; fallOff[y]-=fallV[y]*dt;
+    if(fallOff[y]<=0){
+      const v=fallV[y]; fallOff[y]=0;
+      if(v>.0035){ fallV[y]=-Math.min(v*.3,.0065); if(v>.009&&!landSfx){ landSfx=true; beep(170,70,'sine',0.06,90); } }
+      else fallV[y]=0;
+    }
+  }
   if(running&&!paused&&!quizOpen) st.ms+=dt;
   if(running&&!paused){
-    if(clearing){ clearing.t+=dt; if(clearing.t>=CLEAR_MS) finishClear(); }
+    if(clearing){ if(clearing.hold>0) clearing.hold-=dt; else clearing.t+=dt; if(clearing.t>=CLEAR_MS) finishClear(); }
     else if(piece){ acc+=dt; if(acc>=dropInterval){ acc=0; gravity(); } }
   }
   render();
@@ -996,9 +1066,9 @@ window.addEventListener('keydown',e=>{
 function startGame(){
   if(nameMode||helpMode) return;
   ensureAudio();
-  board=newBoard(); bag=[]; piece=newPiece(); queue=[newPiece(),newPiece(),newPiece()]; held=null; canHold=true; clearing=null; fallOff=Array(ROWS).fill(0);
+  board=newBoard(); bag=[]; piece=newPiece(); queue=[newPiece(),newPiece(),newPiece()]; held=null; canHold=true; clearing=null; fallOff=Array(ROWS).fill(0); fallV=Array(ROWS).fill(0);
   st.maxCombo=0; st.quizRight=0; st.quizTotal=0; st.ms=0; st.pieces=0;
-  parts.length=0; pops.length=0; flashes.length=0; trails.length=0;
+  parts.length=0; pops.length=0; flashes.length=0; trails.length=0; blooms.length=0; wellFlash=0;
   score=0; level=1; lines=0; dropInterval=intervalFor(1); acc=0; combo=0; pieceCount=0;
   quizOpen=false; $('quiz').classList.add('hidden'); setTheme(0);
   running=true; paused=false; pauseBtn.textContent='⏸ PAUSA';
