@@ -708,6 +708,7 @@ function shades(hex){
 }
 function drawBlock(c,x,y,s,hex,sc){
   if(sc!==undefined&&sc!==1){ const d=s*(1-sc)/2; x+=d; y+=d; s*=sc; }
+  if(s<=6) return;   /* demasiado pequeno para desenhar (raio negativo faz o canvas lançar erro) */
   const sh=shades(hex), g=1.3, px=x+g, py=y+g, ps=s-2*g, r=ps*.26;
   rrVan(c,px,py,ps,ps,r);
   const gr=c.createLinearGradient(0,py,0,py+ps);
@@ -807,6 +808,7 @@ function render(){
       if(p>=1) continue;
       /* fase 1: cresce e fica branco · fase 2: encolhe a brilhar e desaparece */
       const up=p<.3, u=up?p/.3:(p-.3)/.7, sc=up?1+.2*u:1.2*(1-u*u);
+      if(sc<.15) continue;
       ctx.save(); ctx.translate((x+.5)*CELL,(y+.5)*CELL);
       ctx.shadowColor='rgba(255,255,255,.9)'; ctx.shadowBlur=up?14*u:14*(1-u);
       ctx.globalAlpha=up?1:1-u*.5;
@@ -990,7 +992,7 @@ function frame(t){
     if(clearing){ if(clearing.hold>0) clearing.hold-=dt; else clearing.t+=dt; if(clearing.t>=CLEAR_MS) finishClear(); }
     else if(piece){ acc+=dt; if(acc>=dropInterval){ acc=0; gravity(); } }
   }
-  render();
+  try{ render(); }catch(e){ if(!frame.warned){ frame.warned=true; console.error('render:',e); } }
   requestAnimationFrame(frame);
 }
 
