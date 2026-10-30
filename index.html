@@ -341,7 +341,7 @@ html,body{min-height:100%}
         <div class="stat">🧩 Nível <strong id="level">1</strong></div>
         <div class="stat">📏 Linhas <strong id="lines">0</strong></div>
         <div class="stat">🔥 Combo <strong id="combo">0</strong></div>
-        <div class="stat">➡️ Próximo nível <strong id="nextLevel">600</strong></div>
+        <div class="stat">➡️ Próximo nível <strong id="nextLevel">1000</strong></div>
         <hr>
         <div class="stat">🏆 Recorde <strong id="bestScore">0</strong></div>
         <div class="hint">
@@ -586,7 +586,7 @@ function sfxOver(){ [392,330,262,196].forEach((f,i)=>beep(f,220,'triangle',0.07,
 
 /* ═══════════════ JOGO ═══════════════ */
 const COLS=12, ROWS=22, CELL=30, W=COLS*CELL, H=ROWS*CELL;
-const POINTS_LEVEL=600, CLEAR_MS=500;
+const POINTS_LEVEL=1000, CLEAR_MS=500;
 
 const COLORS={I:'#19d3ff',J:'#3b5bff',L:'#ff8a1f',O:'#ffe033',S:'#7ae83a',T:'#b44cff',Z:'#ff3b3b',U:'#ff4fd8',P:'#dfe6f5',I3:'#00b386'};
 const SHAPES={
@@ -595,11 +595,11 @@ const SHAPES={
   U:[[1,0,1],[1,1,1]], P:[[0,1,0],[1,1,1],[0,1,0]], I3:[[1,1,1]]
 };
 const KEYS_ALL=Object.keys(SHAPES), KEYS_CLASSIC=['I','J','L','O','S','T','Z'];
-const DIFF={facil:{n:'FÁCIL',e:'🐢',base:900,step:45,min:160},normal:{n:'NORMAL',e:'⚡',base:720,step:55,min:120},dificil:{n:'DIFÍCIL',e:'🔥',base:520,step:70,min:90}};
+const DIFF={facil:{n:'FÁCIL',e:'🐢',base:900,f:.93,min:200},normal:{n:'NORMAL',e:'⚡',base:720,f:.92,min:140},dificil:{n:'DIFÍCIL',e:'🔥',base:520,f:.90,min:100}};
 const DIFF_KEYS=['facil','normal','dificil'];
 let diff='normal';
 try{ const d=localStorage.getItem('vb_tetris_dif'); if(DIFF[d]) diff=d; }catch(e){}
-const intervalFor=lv=>Math.max(DIFF[diff].min,DIFF[diff].base-(lv-1)*DIFF[diff].step);
+const intervalFor=lv=>Math.max(DIFF[diff].min,Math.round(DIFF[diff].base*Math.pow(DIFF[diff].f,lv-1)));
 let modeExtra=false;
 try{ modeExtra=localStorage.getItem('vb_tetris_modo')==='extra'; }catch(e){}
 const bestKey=()=>(modeExtra?'tetris_best_score_extra':'tetris_best_score_v3')+(diff==='normal'?'':'_'+diff);
