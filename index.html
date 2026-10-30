@@ -203,7 +203,7 @@ hr{border:none;border-top:1px solid rgba(236,30,121,.3);margin:8px 0}
 
 /* ── ajuste automático ao ecrã ── */
 html,body{min-height:100%}
-.game-col{width:calc(var(--bw,360px) + 22px);max-width:100%}
+.game-col{width:calc(var(--bw,360px) + var(--chrome,22px));max-width:100%}
 .frame{width:100%}
 .pad button{height:clamp(40px,calc(var(--bw,300px) * .2),80px)!important;font-size:clamp(1.1rem,calc(var(--bw,300px) * .06),1.8rem)}
 @media (min-width:760px){ .screen{flex-wrap:nowrap;align-items:flex-start} }
@@ -215,6 +215,53 @@ html,body{min-height:100%}
 .small-board #ovTitle{font-size:1.3rem} .small-board #ovText,.small-board #qFb{font-size:.72rem}
 .small-board #qText{font-size:.85rem} .small-board #qOpts .btn{font-size:.74rem;padding:6px 8px}
 #quiz,#overlay{overflow:auto}
+
+/* ── telemóvel (vertical): tudo num só ecrã, sem scroll ── */
+.mobile-only{display:none!important}
+#hud{display:none}
+@media (max-width:759px){
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+  body{min-height:0}
+  #app{height:100vh;height:100dvh;padding:calc(6px + env(safe-area-inset-top)) calc(6px + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left));gap:6px}
+  header{flex-wrap:nowrap;gap:8px;padding:5px 8px;border-radius:16px;overflow:visible;z-index:5;flex:none}
+  header::after{display:none}
+  .hdr-text{flex:1 1 auto;min-width:0}
+  h1{font-size:clamp(1rem,4.7vw,1.25rem);flex-wrap:nowrap;white-space:nowrap;line-height:1.1}
+  #greet{font-size:.68rem;margin-top:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hdr-btns{gap:6px}
+  .hdr-btns .btn{width:38px;height:38px;padding:0;font-size:1.05rem;border-radius:11px;box-shadow:2px 3px 0 var(--shadow)}
+  .hdr-btns .lbl{display:none}
+  .mobile-only{display:inline-flex!important}
+
+  header .mascot{margin:0;padding:0;animation:none;position:relative;flex:none}
+  header #vb{width:46px;height:46px;margin:-4px 0}
+  header .mascot .bubble{position:absolute;top:calc(100% + 10px);right:-4px;left:auto;z-index:30;width:max-content;max-width:min(240px,80vw);transform:translateY(-6px) scale(.92)}
+  header .mascot .bubble.show{transform:none}
+  header .mascot .bubble::before{left:auto;right:30px;top:-11px;transform:none;border:8px solid transparent;border-top:0;border-bottom:11px solid var(--magenta)}
+
+  .screen{flex:1 1 auto;min-height:0;flex-direction:column;flex-wrap:nowrap;align-items:center;justify-content:flex-start;gap:6px;padding:6px;border-width:2px;border-radius:16px}
+  #hud{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:6px;width:100%;flex:none;background:rgba(10,5,32,.7);border:1px solid rgba(236,30,121,.35);border-radius:12px;padding:4px 6px}
+  .hud-box{position:relative;line-height:0}
+  .hud-box i{position:absolute;left:2px;top:0;font-style:normal;font-size:.6rem;line-height:1;opacity:.85}
+  #hudHold{width:50px;height:50px}
+  #hudNext{width:150px;height:50px}
+  #hudHold,#hudNext{background:#08041a;border-radius:8px;border:1px solid rgba(236,30,121,.4)}
+  .hud-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px 4px;text-align:center;min-width:0}
+  .hud-stats div{font-size:.62rem;line-height:1.15;color:var(--peach);font-weight:700;white-space:nowrap}
+  .hud-stats b{display:block;font-family:'Fredoka One','Baloo 2',system-ui,sans-serif;font-weight:400;font-size:1rem;color:var(--gold);line-height:1.1}
+
+  .game-col{gap:6px}
+  .frame{padding:5px;border-radius:12px}
+  #overlay,#quiz{inset:5px}
+  .pad{gap:7px}
+  .pad button{height:clamp(44px,calc(var(--bw,300px) * .17),64px)!important;border-width:2px;border-radius:12px;box-shadow:0 4px 0 #7a1e04,0 0 10px rgba(236,30,121,.4)}
+  #app-footer{flex:none;padding:2px 0 0;font-size:.68rem;border-top:0;line-height:1.2}
+
+  .side-col{display:none;position:fixed;inset:0;z-index:60;background:rgba(8,3,22,.92);align-items:center;justify-content:center;padding:16px;width:auto;max-width:none;overflow:auto}
+  body.menu-open .side-col{display:flex}
+  .side-col aside{width:min(100%,340px)}
+  aside .info{display:none}
+}
 </style>
 </head>
 <body>
@@ -226,11 +273,21 @@ html,body{min-height:100%}
       <div id="greet"></div>
     </div>
     <div class="hdr-btns">
-      <button class="btn secondary small" id="soundBtn" title="Ligar/desligar o som">🔊 Som</button>
+      <button class="btn small mobile-only" id="hMenu" title="Menu" aria-label="Menu">☰</button>
+      <button class="btn small mobile-only" id="hPause" title="Pausa" aria-label="Pausa">⏸</button>
+      <button class="btn secondary small" id="soundBtn" title="Ligar/desligar o som" aria-label="Som">🔊<span class="lbl"> Som</span></button>
     </div>
   </header>
 
   <div class="screen">
+    <div id="hud" aria-hidden="true">
+      <div class="hud-box"><i>📦</i><canvas id="hudHold" width="100" height="100"></canvas></div>
+      <div class="hud-stats">
+        <div>⭐<b id="hScore">0</b></div><div>🧩<b id="hLevel">1</b></div><div>📏<b id="hLines">0</b></div>
+        <div>🔥<b id="hCombo">0</b></div><div>🏆<b id="hBest">0</b></div><div>➡️<b id="hNext">0</b></div>
+      </div>
+      <div class="hud-box"><i>🔮</i><canvas id="hudNext" width="300" height="100"></canvas></div>
+    </div>
     <div class="game-col">
       <div class="frame">
         <canvas id="board"></canvas>
@@ -271,6 +328,7 @@ html,body{min-height:100%}
         <button class="btn" id="modeBtn">🎮 CLÁSSICO</button>
         <button class="btn" id="quizBtn">🧠 PERGUNTAS</button>
         <button class="btn" id="helpBtn">❓ AJUDA</button>
+        <button class="btn secondary wide mobile-only" id="menuClose">✖ FECHAR</button>
       </div>
 
       <div class="info">
@@ -881,7 +939,7 @@ function render(){
   }
   ctx.restore();
 
-  drawNext();
+  drawNext(); drawHud();
   scoreEl.textContent=score; levelEl.textContent=level; linesEl.textContent=lines;
   nextLevelEl.textContent=Math.max(0,level*POINTS_LEVEL-score); comboEl.textContent=combo;
 }
@@ -1134,26 +1192,67 @@ nameIn.addEventListener('keydown',e=>{ e.stopPropagation(); if(e.key==='Enter'){
 $('greet').onclick=askName;
 ovBtn.onclick=()=>{ if(nameMode) saveName(); else if(helpMode) closeHelp(); else if(running&&paused) togglePause(); else startGame(); };
 if(!playerName) askName(); else if(!helpSeen()) showHelp(); if(playerName) setTimeout(()=>vbSay('Olá, '+playerName+'! Vamos jogar? 🎮',4000),900);
-soundBtn.onclick=()=>{ soundOn=!soundOn; soundBtn.textContent=soundOn?'🔊 Som':'🔇 Sem som'; };
+soundBtn.onclick=()=>{ soundOn=!soundOn; soundBtn.innerHTML=(soundOn?'🔊<span class="lbl"> Som</span>':'🔇<span class="lbl"> Sem som</span>'); };
 ghostBtn.onclick=()=>{ showGhost=!showGhost; ghostBtn.textContent=showGhost?'👻 SOMBRA':'👻 SEM SOMBRA'; };
 document.addEventListener('visibilitychange',()=>{ if(document.hidden&&running&&!paused) togglePause(); });
+
+
+/* ═══════════════ BARRA DE ESTADO (telemóvel) ═══════════════ */
+const mqMobile=window.matchMedia('(max-width:759px)');
+const hudCv=$('hudNext'), hudCtx=hudCv.getContext('2d'), hudHoldCv=$('hudHold'), hudHoldCtx=hudHoldCv.getContext('2d');
+const hudEls={score:$('hScore'),level:$('hLevel'),lines:$('hLines'),combo:$('hCombo'),best:$('hBest'),next:$('hNext')};
+let hudKey='', hudTxt={};
+function hudSet(k,v){ v=String(v); if(hudTxt[k]!==v){ hudTxt[k]=v; hudEls[k].textContent=v; } }
+function drawHud(){
+  if(!mqMobile.matches) return;
+  hudSet('score',score); hudSet('level',level); hudSet('lines',lines); hudSet('combo',combo);
+  hudSet('best',bestScore); hudSet('next',Math.max(0,level*POINTS_LEVEL-score));
+  const key=(held||'-')+canHold+queue.map(q=>q?q.color+q.shape.length+q.shape[0].length:'').join('|');
+  if(key===hudKey) return; hudKey=key;
+  hudCtx.clearRect(0,0,hudCv.width,hudCv.height); hudHoldCtx.clearRect(0,0,100,100);
+  if(held) drawMini(hudHoldCtx,SHAPES[held],COLORS[held],22,50,52,canHold?1:.35);
+  if(queue[0]) drawMini(hudCtx,queue[0].shape,queue[0].color,24,50,52);
+  if(queue[1]) drawMini(hudCtx,queue[1].shape,queue[1].color,18,150,52,.9);
+  if(queue[2]) drawMini(hudCtx,queue[2].shape,queue[2].color,18,250,52,.75);
+}
+
+/* ═══════════════ MENU + MASCOTE (telemóvel) ═══════════════ */
+const sideColEl=document.querySelector('.side-col'), mascotEl=$('mascot'), hdrEl=document.querySelector('header'), hdrBtnsEl=document.querySelector('.hdr-btns');
+function placeMascot(){
+  if(mqMobile.matches){ if(mascotEl.parentElement!==hdrEl) hdrEl.insertBefore(mascotEl,hdrBtnsEl); }
+  else { if(mascotEl.parentElement!==sideColEl) sideColEl.appendChild(mascotEl); document.body.classList.remove('menu-open'); }
+  hudKey=''; scheduleFit();
+}
+function openMenu(){ if(running&&!paused&&!quizOpen) togglePause(); document.body.classList.add('menu-open'); }
+function closeMenu(){ document.body.classList.remove('menu-open'); }
+$('hMenu').onclick=openMenu; $('menuClose').onclick=closeMenu;
+sideColEl.addEventListener('click',e=>{ if(e.target===sideColEl) closeMenu(); });
+[startBtn,resetBtn,helpBtn].forEach(b=>b.addEventListener('click',closeMenu));
+const hPauseEl=$('hPause'); hPauseEl.onclick=()=>pauseBtn.click();
+new MutationObserver(()=>{ hPauseEl.textContent=/CONTINUAR/.test(pauseBtn.textContent)?'▶':'⏸'; }).observe(pauseBtn,{childList:true,characterData:true,subtree:true});
+if(mqMobile.addEventListener) mqMobile.addEventListener('change',placeMascot); else mqMobile.addListener(placeMascot);
 
 /* ═══════════════ AJUSTE AO ECRÃ ═══════════════ */
 const fitRoot=document.documentElement, fitCol=document.querySelector('.game-col'), fitFrame=document.querySelector('.frame');
 function fitBoard(){
   const vv=window.visualViewport, vw=vv?vv.width:window.innerWidth, vh=vv?vv.height:window.innerHeight;
-  const sideBySide=vw>=760;
+  const mobile=mqMobile.matches, sideBySide=vw>=760;
   const appEl=$('app'), cs=getComputedStyle(appEl), pad=parseFloat(cs.paddingLeft)||0;
-  const screenEl=document.querySelector('.screen'), sp=parseFloat(getComputedStyle(screenEl).paddingLeft)||0;
-  const chrome=22;                                   // moldura + bordas à volta do canvas
-  let availW=Math.min(vw,appEl.parentElement.clientWidth||vw, 1000) - 2*pad - 2*sp - 8 - chrome;
-  if(sideBySide) availW-=290+20;                     // painel lateral + espaço
+  const screenEl=document.querySelector('.screen'), scs=getComputedStyle(screenEl), sp=parseFloat(scs.paddingLeft)||0;
+  const fcs=getComputedStyle(fitFrame);
+  const chrome=2*((parseFloat(fcs.paddingLeft)||0)+(parseFloat(fcs.borderLeftWidth)||0));
+  const slack=mobile?2*(parseFloat(scs.borderLeftWidth)||0)+2:8;
+  let availW=Math.min(vw,appEl.parentElement.clientWidth||vw, 1000) - 2*pad - 2*sp - slack - chrome;
+  if(sideBySide) availW-=290+20;
   const top=fitCol.getBoundingClientRect().top+window.scrollY;
-  const other=fitCol.offsetHeight-canvas.offsetHeight;   // moldura + botões de toque
-  const availH=vh-top-other-(sp+pad+8);
+  const other=fitCol.offsetHeight-canvas.offsetHeight;
+  let below=sp+pad+8;
+  if(mobile) below=sp+(parseFloat(scs.borderBottomWidth)||0)+(parseFloat(cs.paddingBottom)||0)+$('app-footer').offsetHeight+(parseFloat(cs.rowGap)||6)+2;
+  const availH=vh-top-other-below;
   let bw=Math.min(availW, availH*COLS/ROWS, 560);
   bw=Math.max(110, Math.floor(bw));
   fitRoot.style.setProperty('--bw', bw+'px');
+  fitRoot.style.setProperty('--chrome', chrome+'px');
   fitCol.classList.toggle('small-board', bw<260);
   fitFrame.classList.toggle('small-board', bw<260);
 }
@@ -1163,7 +1262,9 @@ window.addEventListener('resize',scheduleFit);
 window.addEventListener('orientationchange',()=>setTimeout(scheduleFit,250));
 if(window.visualViewport) window.visualViewport.addEventListener('resize',scheduleFit);
 if(window.ResizeObserver) new ResizeObserver(scheduleFit).observe(document.querySelector('header'));
+if(window.ResizeObserver) new ResizeObserver(scheduleFit).observe($('hud'));
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(scheduleFit);
+placeMascot();
 fitBoard();
 
 requestAnimationFrame(frame);

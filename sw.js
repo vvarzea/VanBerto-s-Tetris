@@ -1,5 +1,5 @@
 /* Service worker — Tetris VanBerto's. Rede primeiro para HTML/JS/CSS (como na Beach House), cache para offline. */
-const CACHE = 'vb-tetris-v3';
+const CACHE = 'vb-tetris-v4';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
