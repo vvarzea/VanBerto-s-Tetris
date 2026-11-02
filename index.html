@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Tetris VanBerto's">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka+One&family=Lexend:wght@400;600&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#241143; --panel:#2a0a4e; --panel2:#1a0835; --panel3:#0f0525;
@@ -272,12 +272,70 @@ html,body{min-height:100%}
 #qOpts .btn.bad{animation:badShake .45s}
 @keyframes okPop{0%{transform:scale(.94)}50%{transform:scale(1.07)}100%{transform:scale(1)}}
 @keyframes badShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.q-law{margin-top:6px;padding:6px 10px;border-radius:10px;background:rgba(255,167,51,.12);border:1px solid rgba(255,167,51,.45);color:#ffe9c2;font-size:.78rem;line-height:1.35;text-align:left}
+.small-board .q-law{font-size:.66rem;padding:4px 8px}
 .qplus{position:absolute;left:50%;top:22%;font-family:'Fredoka One','Baloo 2',system-ui,sans-serif;font-size:2.3rem;color:#ffd93b;
   text-shadow:0 0 18px rgba(255,217,59,.85),0 3px 0 #2a0a4e;pointer-events:none;z-index:5;white-space:nowrap;animation:qPlus 1.25s ease-out forwards}
 @keyframes qPlus{0%{opacity:0;transform:translate(-50%,10px) scale(.5)}20%{opacity:1;transform:translate(-50%,0) scale(1.25)}100%{opacity:0;transform:translate(-50%,-80px) scale(1)}}
 .qstar{position:absolute;left:50%;top:24%;pointer-events:none;font-size:1.4rem;z-index:4;animation:qStar .95s ease-out forwards}
 @keyframes qStar{0%{opacity:1;transform:translate(-50%,-50%) scale(.4)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.3) rotate(240deg)}}
 @media (prefers-reduced-motion:reduce){.frame.pulse,.qstar{animation:none}}
+/* conteúdo centrado, mas sem ficar cortado em cima quando é maior do que a caixa (letra grande) */
+#quiz,#overlay{justify-content:flex-start!important}
+#quiz::before,#quiz::after,#overlay::before,#overlay::after{content:'';margin:auto}
+/* ── perguntas acessíveis ── */
+.sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#a11yBar{order:-1;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%}
+#a11yBar .btn{font-size:.68rem;padding:4px 8px;box-shadow:2px 2px 0 var(--shadow)}
+#a11yBar .btn[aria-pressed="true"]{background:linear-gradient(180deg,#4ecb71,#00b894);color:#04210f;border-color:var(--gold)}
+#quiz :focus-visible,#overlay :focus-visible{outline:3px solid #ffe033;outline-offset:2px}
+#qText:focus{outline:none}
+#qOpts .btn{min-height:46px}
+#qOpts .btn.ok::before{content:'✔ ';font-weight:900}
+#qOpts .btn.bad::before{content:'✖ ';font-weight:900}
+body.a11y-big #qText{font-size:1.45rem}
+body.a11y-big #qOpts .btn{font-size:1.15rem;padding:12px 14px}
+body.a11y-big #qFb,body.a11y-big .q-law{font-size:1.02rem}
+body.a11y-big .q-tag,body.a11y-big #qHint{font-size:.9rem}
+body.a11y-big #a11yBar .btn{font-size:.82rem}
+body.a11y-contrast #quiz{background:#000}
+body.a11y-contrast #qText,body.a11y-contrast #qFb,body.a11y-contrast .q-tag{color:#fff}
+body.a11y-contrast #qHint{color:#ffe033}
+body.a11y-contrast #qOpts .btn{background:#000;color:#fff;border:3px solid #fff;box-shadow:none}
+body.a11y-contrast #qOpts .btn.ok{background:#006b1f;color:#fff}
+body.a11y-contrast #qOpts .btn.bad{background:#9b0000;color:#fff}
+body.a11y-contrast .q-law{background:#1a1200;border:2px solid #ffe033;color:#fff}
+body.a11y-contrast #a11yBar .btn{background:#000;color:#fff;border:2px solid #fff;box-shadow:none}
+body.a11y-contrast #a11yBar .btn[aria-pressed="true"]{background:#ffe033;color:#000}
+body.a11y-easy #quiz{font-family:'Lexend','Verdana','Arial',sans-serif}
+body.a11y-easy #quiz *{font-family:inherit!important;letter-spacing:.03em;line-height:1.6}
+
+/* ── festa no fim do jogo ── */
+#party{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6;border-radius:14px}
+.medal-wrap{position:relative;display:inline-block;padding:6px 14px}
+.medal-wrap.rays::before{content:'';position:absolute;inset:-52px;z-index:-1;border-radius:50%;
+  background:repeating-conic-gradient(rgba(255,214,64,.42) 0 9deg,transparent 9deg 18deg);
+  -webkit-mask:radial-gradient(circle,#000 18%,transparent 68%);mask:radial-gradient(circle,#000 18%,transparent 68%);
+  animation:raysSpin 14s linear infinite}
+@keyframes raysSpin{to{transform:rotate(360deg)}}
+.medal.party{animation:medalIn .95s cubic-bezier(.34,1.56,.64,1) both,vbFloat 2.4s ease-in-out .95s infinite}
+@keyframes medalIn{0%{transform:scale(0) rotate(-220deg);opacity:0}60%{transform:scale(1.55) rotate(14deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+#ovTitle.party{animation:titlePop .8s cubic-bezier(.34,1.56,.64,1)}
+@keyframes titlePop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+.medal-t.party{animation:slideUp .5s .55s both}
+.sum.party>div{animation:slideUp .45s both}
+.sum.party>div:nth-child(1){animation-delay:.9s}.sum.party>div:nth-child(2){animation-delay:1.05s}
+.sum.party>div:nth-child(3){animation-delay:1.2s}.sum.party>div:nth-child(4){animation-delay:1.35s}
+.sum.party>div:nth-child(5){animation-delay:1.5s}.sum.party>div:nth-child(6){animation-delay:1.65s}
+@keyframes slideUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:none}}
+.rec{margin-top:4px;padding:4px 14px;border-radius:999px;color:#2a0a4e;font-weight:800;
+  background:linear-gradient(90deg,#ffd93b,#ff8a1f,#ffd93b);background-size:200% 100%;
+  animation:slideUp .5s 1.8s both,shimmer 1.6s linear infinite}
+.rec strong{color:#2a0a4e}
+@keyframes shimmer{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){
+  .medal.party,.medal-t.party,.sum.party>div,.rec,#ovTitle.party,.medal-wrap.rays::before{animation:none}
+}
 </style>
 </head>
 <body>
@@ -314,14 +372,23 @@ html,body{min-height:100%}
           <button class="btn go" id="ovBtn">▶ COMEÇAR</button>
           <div class="kbhint">⌨️ Enter</div>
         </div>
-        <div id="quiz" class="hidden" role="dialog" aria-live="polite">
+        <div id="quiz" class="hidden" role="dialog" aria-modal="true" aria-labelledby="qText">
           <div class="q-tag" id="qTag">🧠 Pergunta VanBerto's · +100 pontos</div>
-          <div id="qText"></div>
+          <div id="qText" tabindex="-1"></div>
           <div id="qOpts"></div>
           <div id="qHint"></div>
-          <div id="qFb"></div>
+          <div id="qFb" role="status" aria-live="polite"></div>
           <button class="btn go hidden" id="qNext">Continuar ▶</button>
+          <div id="a11yBar" role="group" aria-label="Acessibilidade das perguntas">
+            <button type="button" class="btn small" id="aListen">🔊 Ouvir</button>
+            <button type="button" class="btn small" id="aAuto" aria-pressed="false">🗣️ Ler sempre</button>
+            <button type="button" class="btn small" id="aBig" aria-pressed="false">🔠 Letra grande</button>
+            <button type="button" class="btn small" id="aContrast" aria-pressed="false">◐ Contraste</button>
+            <button type="button" class="btn small" id="aEasy" aria-pressed="false">Aa Letra clara</button>
+          </div>
         </div>
+        <canvas id="party" aria-hidden="true"></canvas>
+        <div id="srStatus" class="sr-only" role="status" aria-live="polite"></div>
       </div>
       <div class="pad" id="pad">
         <button data-a="left" aria-label="Esquerda">◀</button>
@@ -608,6 +675,14 @@ function sfxCorrect(streak){ beep(988,90,'triangle',0.07,null,0); beep(1319,260,
 function sfxWrong(){ beep(240,200,'triangle',0.05,150); }
 function sfxPerfect(){ [523,659,784,1047,1319,1568,2093].forEach((f,i)=>beep(f,170,'triangle',0.07,f*1.02,i*0.07)); [523,784,1047,1568].forEach(f=>beep(f,700,'triangle',0.045,null,0.52)); }
 function sfxOver(){ [392,330,262,196].forEach((f,i)=>beep(f,220,'triangle',0.07,f*0.9,i*0.17)); }
+/* fanfarra do fim: quanto melhor a medalha, maior a festa */
+function sfxParty(tier,rec){
+  const run=[523,659,784,1047,1319,1568,2093], n=[3,5,6,7][tier]+(rec?1:0);
+  for(let i=0;i<Math.min(n,run.length);i++) beep(run[i],150,'triangle',0.07,run[i]*1.01,i*0.09);
+  const t0=n*0.09+0.05;
+  [523,659,784,1047].slice(0,tier>=2?4:3).forEach(f=>beep(f,tier>=2?950:520,'triangle',0.05,null,t0));
+  if(tier>=3||rec) for(let i=0;i<8;i++) beep(1500+Math.random()*1800,70,'sine',0.03,null,t0+0.1+i*0.12);
+}
 
 /* ═══════════════ JOGO ═══════════════ */
 const COLS=12, ROWS=22, CELL=30, W=COLS*CELL, H=ROWS*CELL;
@@ -767,19 +842,110 @@ function finishClear(){
   }
   spawnNext();
 }
+/* ═══════════════ FESTA NO FIM DO JOGO ═══════════════ */
+const partyCv=$('party'), pctx=partyCv.getContext('2d');
+let partyRaf=0, partyP=[], partyEnd=0, partyTier=0, partyRec=false, partyLast=0, partyNextFw=0, partyAcc=0, partyW=0, partyH=0, partyDpr=1;
+const PCOL=['#ff3b3b','#ffe033','#7ae83a','#19d3ff','#b44cff','#ff4fd8','#ff8a1f','#ffffff'];
+function partySize(){
+  const r=partyCv.parentElement.getBoundingClientRect(); partyDpr=Math.min(2,window.devicePixelRatio||1);
+  partyW=r.width; partyH=r.height; partyCv.width=Math.round(partyW*partyDpr); partyCv.height=Math.round(partyH*partyDpr);
+}
+function partyStop(){ cancelAnimationFrame(partyRaf); partyRaf=0; partyP.length=0; pctx.clearRect(0,0,partyCv.width,partyCv.height); }
+function partyConfetti(x,y,vx,vy){
+  partyP.push({k:Math.random()<.18?'s':Math.random()<.3?'o':'c',x,y,vx,vy,rot:Math.random()*6.3,vr:(Math.random()-.5)*10,flip:Math.random()*6.3,
+    w:6+Math.random()*6,h:9+Math.random()*7,c:PCOL[Math.floor(Math.random()*PCOL.length)]});
+}
+function partyCannon(side,n){
+  for(let i=0;i<n;i++){
+    const a=-(0.8+Math.random()*0.6), sp=(650+Math.random()*650)*Math.max(.7,partyH/700);
+    partyConfetti(side<0?partyW*.03:partyW*.97,partyH*.96,Math.cos(a)*sp*(side<0?1:-1),Math.sin(a)*sp);
+  }
+}
+function partyFirework(){
+  const x=partyW*(.15+Math.random()*.7), y=partyH*(.1+Math.random()*.32), c=PCOL[Math.floor(Math.random()*7)], n=34;
+  for(let i=0;i<n;i++){ const a=i/n*6.283+Math.random()*.2, sp=110+Math.random()*170;
+    partyP.push({k:'f',x,y,px:x,py:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:0,max:.9+Math.random()*.6,c}); }
+  beep(180,90,'triangle',0.05,60); beep(1200+Math.random()*800,60,'sine',0.025,null,0.05);
+}
+function partyStar(ctx,x,y,r){ ctx.beginPath(); for(let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5, rr=i%2?r*.45:r; ctx.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr); } ctx.closePath(); ctx.fill(); }
+function partyLoop(){
+  const now=performance.now(), dt=Math.min((now-partyLast)/1000,.05); partyLast=now;
+  pctx.setTransform(partyDpr,0,0,partyDpr,0,0); pctx.clearRect(0,0,partyW,partyH);
+  const active=now<partyEnd;
+  if(active&&now<partyEnd-1300&&partyP.length<420){
+    partyAcc+=(22+partyTier*22+(partyRec?30:0))*dt;
+    while(partyAcc>=1){ partyAcc--; partyConfetti(Math.random()*partyW,-12,(Math.random()-.5)*80,60+Math.random()*90); }
+  }
+  if((partyTier>=3||partyRec)&&active&&now<partyEnd-900&&now>=partyNextFw){ partyFirework(); partyNextFw=now+420+Math.random()*350; }
+  for(let i=partyP.length-1;i>=0;i--){
+    const q=partyP[i];
+    if(q.k==='f'){
+      q.life+=dt; if(q.life>q.max){ partyP.splice(i,1); continue; }
+      q.px=q.x; q.py=q.y; q.vy+=140*dt; q.vx*=1-1.1*dt; q.vy*=1-1.1*dt; q.x+=q.vx*dt; q.y+=q.vy*dt;
+      pctx.globalCompositeOperation='lighter'; pctx.globalAlpha=1-q.life/q.max; pctx.strokeStyle=q.c; pctx.lineWidth=2.4;
+      pctx.beginPath(); pctx.moveTo(q.px,q.py); pctx.lineTo(q.x,q.y); pctx.stroke();
+      pctx.globalCompositeOperation='source-over'; pctx.globalAlpha=1; continue;
+    }
+    q.vy+=700*dt; q.vx*=1-2*dt; q.vy*=1-2*dt; q.x+=(q.vx+Math.sin(q.flip)*30)*dt; q.y+=q.vy*dt; q.rot+=q.vr*dt; q.flip+=8*dt;
+    if(q.y>partyH+24){ partyP.splice(i,1); continue; }
+    pctx.save(); pctx.translate(q.x,q.y); pctx.rotate(q.rot); pctx.fillStyle=q.c;
+    if(q.k==='c'){ pctx.scale(1,Math.cos(q.flip)); pctx.fillRect(-q.w/2,-q.h/2,q.w,q.h); }
+    else if(q.k==='o'){ pctx.beginPath(); pctx.arc(0,0,q.w*.45,0,6.283); pctx.fill(); }
+    else partyStar(pctx,0,0,q.w*.9);
+    pctx.restore();
+  }
+  if(!active&&!partyP.length){ partyRaf=0; pctx.clearRect(0,0,partyW,partyH); return; }
+  partyRaf=requestAnimationFrame(partyLoop);
+}
+function partyStart(tier,rec){
+  partyStop(); if(REDUCE) return;
+  partySize(); partyTier=tier; partyRec=rec; partyAcc=0;
+  partyEnd=performance.now()+((tier>=3||rec)?8000:tier>=1?6000:4200); partyNextFw=performance.now()+700; partyLast=performance.now();
+  const n=26+tier*20+(rec?30:0);
+  partyCannon(-1,n); partyCannon(1,n);
+  setTimeout(()=>{ if(partyRaf){ partyCannon(-1,Math.round(n*.6)); partyCannon(1,Math.round(n*.6)); } },900);
+  partyRaf=requestAnimationFrame(partyLoop);
+}
+/* os números do resumo "rolam" de 0 até ao valor final */
+function partyCount(){
+  const els=[...ovText.querySelectorAll('b[data-to]')];
+  if(REDUCE||!els.length) return;
+  const t0=performance.now(); let lastTick=0;
+  els.forEach(el=>{ el.textContent='0'; });
+  (function step(){
+    const now=performance.now(); let done=true;
+    els.forEach((el,i)=>{
+      if(!el.isConnected) return;
+      const to=+el.dataset.to, start=t0+900+i*150, k=Math.min(Math.max((now-start)/1000,0),1);
+      if(k<1) done=false;
+      el.textContent=Math.round(to*(1-Math.pow(1-k,3)));
+      if(i===0&&k>0&&k<1&&now-lastTick>75){ lastTick=now; beep(700+k*700,25,'square',0.02); }
+    });
+    if(!done&&overlay&&!overlay.classList.contains('hidden')) requestAnimationFrame(step);
+    else els.forEach(el=>{ if(el.isConnected) el.textContent=el.dataset.to; });
+  })();
+}
+
 function gameOver(){
-  running=false; piece=null;
+  running=false; piece=null; stopSpeak();
   const novo=score>bestScore;
   if(novo){ bestScore=score; try{ localStorage.setItem(bestKey(),bestScore); }catch(e){} bestEl.textContent=bestScore; }
-  sfxOver();
-  if(novo){ vbSay('Novo recorde! 🏆',3500); vbDance(5); } else { vbSay('Quase! Tenta outra vez 💪',3500); vbSad(); }
-  const medal=score>=2500?['🥇','medalha de ouro!']:score>=1200?['🥈','medalha de prata!']:score>=400?['🥉','medalha de bronze!']:['⭐','boa tentativa!'];
+  const tier=score>=2500?3:score>=1200?2:score>=400?1:0;
+  const medal=[['⭐','boa tentativa!'],['🥉','medalha de bronze!'],['🥈','medalha de prata!'],['🥇','medalha de ouro!']][tier];
   const mins=Math.floor(st.ms/60000), secs=Math.floor(st.ms/1000)%60;
-  showOverlay('FIM DE JOGO',
-    '<div class="medal">'+medal[0]+'</div><div class="medal-t">'+(playerName?playerName+', ':'')+(playerName?medal[1]:medal[1][0].toUpperCase()+medal[1].slice(1))+'</div>'+
-    '<div class="sum"><div>⭐ Pontos <b>'+score+'</b></div><div>🧩 Nível <b>'+level+'</b></div><div>📏 Linhas <b>'+lines+'</b></div><div>🔥 Combo máx. <b>x'+st.maxCombo+'</b></div><div>🧠 Perguntas <b>'+st.quizRight+'/'+st.quizTotal+'</b></div><div>⏱️ Tempo <b>'+mins+':'+String(secs).padStart(2,'0')+'</b></div></div>'+
-    (novo?'<div>🏆 <strong>Novo recorde!</strong></div>':''),
+  const title=novo?'NOVO RECORDE! 🏆':tier>=1?'PARABÉNS! 🎉':'BOA TENTATIVA! 🎈';
+  sfxParty(tier,novo);
+  vbSay(novo?'Novo recorde! 🏆':tier>=1?'Parabéns! 🎉':'Boa tentativa! 💪',3500); vbDance(5);
+  showOverlay(title,
+    '<div class="medal-wrap'+(tier>=3||novo?' rays':'')+'"><div class="medal party">'+medal[0]+'</div></div>'+
+    '<div class="medal-t party">'+(playerName?playerName+', '+medal[1]:medal[1][0].toUpperCase()+medal[1].slice(1))+'</div>'+
+    '<div class="sum party"><div>⭐ Pontos <b data-to="'+score+'">'+score+'</b></div><div>🧩 Nível <b data-to="'+level+'">'+level+'</b></div><div>📏 Linhas <b data-to="'+lines+'">'+lines+'</b></div><div>🔥 Combo máx. <b>x'+st.maxCombo+'</b></div><div>🧠 Perguntas <b>'+st.quizRight+'/'+st.quizTotal+'</b></div><div>⏱️ Tempo <b>'+mins+':'+String(secs).padStart(2,'0')+'</b></div></div>'+
+    (novo?'<div class="rec">🏆 <strong>Novo recorde!</strong></div>':''),
     '↻ JOGAR OUTRA VEZ');
+  ovTitle.classList.remove('party'); void ovTitle.offsetWidth; ovTitle.classList.add('party');
+  partyStart(tier,novo); partyCount();
+  const resumo='Fim de jogo. '+(playerName?playerName+', f':'F')+'izeste '+score+' pontos, chegaste ao nível '+level+', com '+lines+' linhas, e acertaste '+st.quizRight+' de '+st.quizTotal+' perguntas. '+(novo?'Novo recorde! ':'')+'Ganhaste '+(tier?medal[1]:'uma estrela. Boa tentativa!');
+  srSay(resumo); if(a11y.read) setTimeout(()=>speakText(resumo),900);
 }
 function gravity(){ if(valid(0,1)) piece.y++; else lockPiece(); }
 function softDrop(){ if(valid(0,1)){ piece.y++; score+=1; beep(660,25,'square',0.025); } else lockPiece(); }
@@ -1014,89 +1180,130 @@ function drawNext(){
 }
 
 /* ═══════════════ PERGUNTAS DE CIBERSEGURANÇA ═══════════════ */
-const QUIZ_BASE=[
- {q:'Recebes um e-mail a pedir a tua palavra-passe com urgência. O que fazes?',o:['Respondo logo com a palavra-passe','Não respondo e aviso um adulto ou o professor','Reencaminho a todos os amigos'],a:1,e:'Ninguém de confiança pede a tua palavra-passe por e-mail.'},
- {q:'Qual é a palavra-passe mais segura?',o:['123456','O meu nome','Gato!Azul_27Sol'],a:2,e:'Longa, com letras, números e símbolos, e difícil de adivinhar.'},
- {q:'Podes partilhar a tua palavra-passe com os amigos?',o:['Sim, se forem muito amigos','Não, é secreta','Só nas redes sociais'],a:1,e:'A palavra-passe é só tua. Não a partilhes.'},
- {q:'O que é o phishing?',o:['Um jogo de pesca','Uma tentativa de enganar para roubar dados','Um tipo de antivírus'],a:1,e:'São mensagens falsas que tentam roubar os teus dados.'},
- {q:'Encontras uma pen USB no chão. O que fazes?',o:['Ligo ao computador para ver o que tem','Não ligo e entrego a um adulto','Levo para casa'],a:1,e:'Pode ter vírus. Nunca ligues dispositivos desconhecidos.'},
- {q:'Para que serve um antivírus?',o:['Para a internet ser mais rápida','Para proteger o computador de programas maliciosos','Para gravar jogos'],a:1,e:'Deteta e bloqueia programas maliciosos.'},
- {q:'Um desconhecido pede-te amizade numa rede social. O que fazes?',o:['Aceito, quantos mais amigos melhor','Não aceito e falo com um adulto','Dou-lhe o meu número'],a:1,e:'Só aceita quem conheces mesmo.'},
- {q:'O cadeado no endereço de um site significa que…',o:['A ligação é cifrada, mas o site pode não ser de confiança','O site é sempre 100% seguro','O site é gratuito'],a:0,e:'O cadeado protege a ligação, mas confirma sempre o endereço.'},
- {q:'Quando deves atualizar o sistema e as aplicações?',o:['Nunca','Sempre que há atualizações','Só quando avaria'],a:1,e:'As atualizações corrigem falhas de segurança.'},
- {q:'O que é a autenticação de dois fatores?',o:['Ter duas palavras-passe iguais','Uma segunda confirmação para além da palavra-passe','Ter dois utilizadores'],a:1,e:'Mesmo que roubem a palavra-passe, falta a segunda confirmação.'},
- {q:'Podes publicar a tua morada e a tua escola nas redes?',o:['Sim','Não, são dados pessoais','Só à sexta-feira'],a:1,e:'Dados pessoais devem ficar privados.'},
- {q:'Uma mensagem diz que ganhaste um prémio e pede que cliques numa ligação. Provavelmente é…',o:['Sorte','Uma burla','Um presente'],a:1,e:'Prémios que não pediste são quase sempre burlas.'},
- {q:'Numa rede Wi-Fi pública e aberta, o que deves evitar?',o:['Ver vídeos','Pagamentos e iniciar sessões importantes','Nada, é tudo seguro'],a:1,e:'Redes abertas podem ser espiadas.'},
- {q:'Vês um colega a ser alvo de ciberbullying. O que fazes?',o:['Partilho a mensagem','Não alinho e conto a um adulto de confiança','Rio-me'],a:1,e:'Ajudar é não alinhar e pedir ajuda.'},
- {q:'Usar a mesma palavra-passe em todas as contas é…',o:['Uma boa ideia','Arriscado','Obrigatório'],a:1,e:'Se uma conta for roubada, as outras ficam em risco.'},
- {q:'Quem deve saber a tua palavra-passe?',o:['Só tu (e os teus pais, se necessário)','Toda a turma','Quem perguntar'],a:0,e:'Mantém-na secreta.'},
- {q:'Um e-mail com erros de escrita e um remetente estranho é sinal de…',o:['Phishing','Boa educação','Publicidade segura'],a:0,e:'Desconfia e não cliques em nada.'},
- {q:'Antes de instalar uma aplicação, deves…',o:['Descarregá-la de uma loja oficial','Usar o primeiro endereço que aparece','Descarregar de qualquer site'],a:0,e:'As lojas oficiais verificam as aplicações.'}
-];
-const QUIZ_THEME0=["Phishing", "Palavras-passe", "Palavras-passe", "Phishing", "Dispositivos", "Software", "Redes sociais", "Navegar", "Software", "Palavras-passe", "Privacidade", "Burlas", "Navegar", "Ciberbullying", "Palavras-passe", "Palavras-passe", "Phishing", "Software"];
-QUIZ_BASE.forEach((it,i)=>{ it.t=QUIZ_THEME0[i]; });
-const QUIZ_NEW=[{"q":"Como crias uma palavra-passe difícil de adivinhar e fácil de lembrar?","o":["Uso a minha data de aniversário","Junto várias palavras sem relação numa frase longa","Escrevo \"password\""],"a":1,"e":"Uma frase longa de palavras soltas é difícil de adivinhar e fácil de decorar.","t":"Palavras-passe"},
- {"q":"Onde podes guardar muitas palavras-passe com segurança?","o":["Num papel colado no monitor","Num gestor de palavras-passe","Numa mensagem para mim próprio nas redes sociais"],"a":1,"e":"Um gestor guarda-as cifradas e até cria palavras-passe fortes por ti.","t":"Palavras-passe"},
- {"q":"Quando deves mudar uma palavra-passe?","o":["Quando suspeito que alguém a descobriu","Nunca, mesmo que ma roubem","Todos os dias, por precaução"],"a":0,"e":"Se achas que alguém a conhece, muda-a logo (e nas outras contas onde a usaste).","t":"Palavras-passe"},
- {"q":"Usaste um computador da biblioteca. Antes de sair, o que fazes?","o":["Fecho só o separador","Termino a sessão (logout) nas minhas contas","Deixo tudo aberto para o próximo"],"a":1,"e":"Se não terminares a sessão, a pessoa seguinte pode entrar nas tuas contas.","t":"Palavras-passe"},
- {"q":"Qual destas palavras-passe é a mais fraca?","o":["qwerty123","X7#mP!9vLq2z","Cavalo-Verde-Nuvem-42"],"a":0,"e":"Sequências do teclado e números simples são das primeiras que os piratas testam.","t":"Palavras-passe"},
- {"q":"Recebes por SMS um código de verificação que não pediste. O que fazes?","o":["Dou o código a quem o pedir","Ignoro e mudo a palavra-passe: alguém pode estar a tentar entrar","Publico o código para os amigos"],"a":1,"e":"Um código que não pediste pode significar que alguém tenta entrar na tua conta.","t":"Palavras-passe"},
- {"q":"Uma mensagem do \"banco\" traz uma ligação para \"confirmar a conta\". O mais seguro é…","o":["Clicar depressa para não perder a conta","Abrir eu próprio o site do banco ou ligar-lhe","Responder com os dados do cartão"],"a":1,"e":"Escreve tu o endereço oficial ou usa a app. Nunca uses a ligação da mensagem.","t":"Phishing"},
- {"q":"Qual é um sinal de mensagem suspeita?","o":["Ameaça bloquear a conta se não agires depressa","Cumprimenta-te com um bom dia","Chega à hora do costume"],"a":0,"e":"Os burlões criam pressa para não teres tempo de pensar.","t":"Phishing"},
- {"q":"Um anúncio promete um telemóvel novo por 1 euro. Provavelmente é…","o":["Uma promoção verdadeira","Uma burla para ficarem com os teus dados ou dinheiro","Um erro que te favorece"],"a":1,"e":"Se parece bom demais para ser verdade, desconfia.","t":"Burlas"},
- {"q":"Podes confiar numa ligação só porque o texto parece o de um site conhecido?","o":["Sim, o texto mostra sempre o endereço real","Não, o endereço verdadeiro pode ser outro","Sim, se tiver emojis"],"a":1,"e":"Em computador, passa o rato por cima da ligação para ver para onde vai de facto.","t":"Phishing"},
- {"q":"Alguém liga a dizer que é do \"suporte técnico\" e que o teu computador tem vírus. O que fazes?","o":["Dou acesso remoto para resolver","Desligo e não dou acesso nem dados","Pago logo para limpar"],"a":1,"e":"Os serviços verdadeiros não ligam sem tu pedires. É uma burla conhecida.","t":"Burlas"},
- {"q":"O que é o \"spam\"?","o":["Mensagens que não pediste, muitas vezes publicidade ou burlas","Um tipo de antivírus","Uma rede social"],"a":0,"e":"Não respondas nem cliques: marca como spam.","t":"Phishing"},
- {"q":"Vês um código QR num poste a prometer um prémio. O que fazes?","o":["Leio logo com o telemóvel","Desconfio: pode levar a um site falso","Tiro foto e partilho"],"a":1,"e":"Um QR pode esconder uma ligação perigosa, tal como qualquer ligação.","t":"Burlas"},
- {"q":"Um e-mail de um desconhecido traz um anexo chamado \"fatura.exe\". Deves…","o":["Abrir para ver o que é","Não abrir e apagar a mensagem","Reencaminhar aos amigos"],"a":1,"e":"Ficheiros .exe de remetentes desconhecidos podem instalar vírus.","t":"Phishing"},
- {"q":"Qual é o primeiro passo para ver se um e-mail é falso?","o":["Olhar com atenção para o endereço de quem envia","Clicar para ver o que acontece","Responder a perguntar se é verdade"],"a":0,"e":"Endereços estranhos ou com letras trocadas são um grande sinal de alerta.","t":"Phishing"},
- {"q":"Qual destes dados NÃO deves partilhar com desconhecidos?","o":["O teu filme preferido","A tua morada e o teu telefone","O teu desporto favorito"],"a":1,"e":"Morada e telefone permitem que te encontrem. Mantém-nos privados.","t":"Privacidade"},
- {"q":"Podes publicar uma foto de um colega sem lhe perguntar?","o":["Sim, se tiver graça","Não, deves pedir autorização","Sim, desde que a rede seja pequena"],"a":1,"e":"Cada pessoa decide se aparece nas fotografias. Pede sempre licença.","t":"Privacidade"},
- {"q":"Uma app pede acesso à câmara e aos contactos sem motivo. O que fazes?","o":["Aceito tudo","Dou só as permissões de que a app precisa","Dou todas, por segurança"],"a":1,"e":"Uma app de lanterna não precisa dos teus contactos.","t":"Privacidade"},
- {"q":"Publicar uma foto com a localização ligada pode mostrar…","o":["A cor da fotografia","Onde estás ou onde moras","O tamanho do ficheiro"],"a":1,"e":"Desliga a localização nas fotografias que partilhas.","t":"Privacidade"},
- {"q":"O que acontece ao que publicas na internet?","o":["Desaparece passado um dia","Pode ficar guardado e ser copiado, mesmo que apagues","Só tu o podes ver"],"a":1,"e":"Pensa antes de publicar: na internet, quase nada se apaga por completo.","t":"Privacidade"},
- {"q":"Qual é a definição mais segura para o teu perfil numa rede social?","o":["Público, para todos verem","Privado e só com amigos reais","Com o nome da escola e a morada"],"a":1,"e":"Um perfil privado limita quem pode ver o que partilhas.","t":"Redes sociais"},
- {"q":"O que é a \"pegada digital\"?","o":["O rasto de informação que deixas ao usar a internet","Uma marca no teclado","Um programa que apaga ficheiros"],"a":0,"e":"Tudo o que publicas e pesquisas deixa rasto. Cuida dele.","t":"Privacidade"},
- {"q":"Alguém que conheceste num jogo online quer encontrar-se contigo. O que fazes?","o":["Vou sozinho(a), parece simpático","Não combino nada e falo logo com um adulto de confiança","Dou-lhe a minha morada"],"a":1,"e":"Quem conheces só online pode não ser quem diz ser.","t":"Redes sociais"},
- {"q":"Um \"amigo\" online pede-te fotografias privadas. O que fazes?","o":["Envio, se pedir com jeito","Recuso, guardo a conversa e conto a um adulto de confiança","Envio só uma"],"a":1,"e":"Nunca envies fotos privadas. Contar a um adulto é a atitude certa e corajosa.","t":"Redes sociais"},
- {"q":"Um amigo escreve-te a pedir dinheiro com urgência. A conta dele pode ter sido…","o":["Roubada: confirmo por outra via, como telefone ou pessoalmente","Sempre verdadeira","Apagada"],"a":0,"e":"Os burlões usam contas roubadas de amigos para pedir dinheiro.","t":"Redes sociais"},
- {"q":"O que é o ciberbullying?","o":["Jogar online com amigos","Usar a internet ou o telemóvel para magoar ou humilhar alguém","Fazer uma videochamada"],"a":1,"e":"É bullying feito através de ecrãs, e magoa tanto como o presencial.","t":"Ciberbullying"},
- {"q":"Estás a receber mensagens maldosas. O que fazes primeiro?","o":["Respondo com insultos","Guardo provas (capturas de ecrã), bloqueio e peço ajuda","Apago tudo e fico calado"],"a":1,"e":"As provas ajudam os adultos a resolver. Nunca estás sozinho(a).","t":"Ciberbullying"},
- {"q":"Num grupo de conversa, todos gozam com um colega. O que fazes?","o":["Junto-me para não ficar de fora","Não alinho e, se puder, apoio o colega","Reencaminho as piadas"],"a":1,"e":"Um gesto de apoio faz toda a diferença para quem está a ser gozado.","t":"Ciberbullying"},
- {"q":"Para que serve bloquear o telemóvel com PIN ou impressão digital?","o":["Para gastar mais bateria","Para que ninguém aceda aos teus dados se o perderes","Para ter mais rede"],"a":1,"e":"Sem bloqueio, quem encontrar o telemóvel vê tudo.","t":"Dispositivos"},
- {"q":"Qual é o PIN mais seguro?","o":["0000","O meu ano de nascimento","Um número que ninguém adivinhe facilmente"],"a":2,"e":"Evita sequências e datas que os outros conhecem.","t":"Dispositivos"},
- {"q":"Vais sair um minuto do computador da escola. O que fazes?","o":["Bloqueio o ecrã (por exemplo, Windows + L)","Deixo tudo aberto","Só desligo o monitor"],"a":0,"e":"Em um minuto, alguém pode ver ou mexer nas tuas coisas.","t":"Dispositivos"},
- {"q":"Porque pode ser arriscado carregar o telemóvel numa porta USB pública?","o":["Estraga a capa","Alguém pode tentar roubar dados ou instalar programas maliciosos","Carrega mais devagar"],"a":1,"e":"Se puderes, usa o teu carregador numa tomada.","t":"Dispositivos"},
- {"q":"Para evitar que te espiem pela webcam, podes…","o":["Tapá-la quando não a usas","Deixá-la sempre ligada","Partilhar o ecrã"],"a":0,"e":"Uma tampa simples na webcam é uma boa proteção.","t":"Dispositivos"},
- {"q":"Quando não estás a usar o Bluetooth, o mais seguro é…","o":["Deixá-lo sempre ligado","Desligá-lo","Aceitar ligações de todos"],"a":1,"e":"Bluetooth desligado é uma porta fechada para estranhos.","t":"Dispositivos"},
- {"q":"Como deves proteger o Wi-Fi de casa?","o":["Manter a palavra-passe de fábrica do router","Mudar a palavra-passe do router para uma forte","Deixar a rede aberta"],"a":1,"e":"As palavras-passe de fábrica são conhecidas e fáceis de adivinhar.","t":"Dispositivos"},
- {"q":"Aparece uma janela a dizer \"Tens 5 vírus! Clica aqui\". O que fazes?","o":["Clico para limpar já","Fecho a janela e, se continuar, falo com um adulto","Descarrego o programa sugerido"],"a":1,"e":"É um falso alarme feito para te enganar a instalar vírus.","t":"Software"},
- {"q":"Um site oferece de graça um jogo pago \"crackeado\". O risco é…","o":["Nenhum","Trazer vírus escondidos","Ficar sem espaço no disco"],"a":1,"e":"Programas pirateados são um dos caminhos preferidos dos vírus.","t":"Software"},
- {"q":"Para que serve uma firewall?","o":["Para aquecer o computador","Para vigiar o que entra e sai da rede e bloquear acessos suspeitos","Para guardar fotografias"],"a":1,"e":"É como um porteiro que só deixa passar o que é seguro.","t":"Software"},
- {"q":"O que é o \"malware\"?","o":["Software criado para causar danos ou espiar","Um tipo de teclado","Um jogo de cartas"],"a":0,"e":"Vírus, espiões e outros programas maliciosos chamam-se malware.","t":"Software"},
- {"q":"O que faz o ransomware?","o":["Acelera o computador","Bloqueia os teus ficheiros e pede dinheiro para os libertar","Organiza as tuas músicas"],"a":1,"e":"Por isso é tão importante ter cópias de segurança.","t":"Software"},
- {"q":"Qual é a melhor defesa contra a perda de ficheiros importantes?","o":["Fazer cópias de segurança (backups)","Guardar tudo num só sítio","Apagar os ficheiros antigos"],"a":0,"e":"Uma cópia noutro local salva-te de avarias, roubos e ransomware.","t":"Software"},
- {"q":"Porque deves manter o navegador atualizado?","o":["Para mudar a cor","Para corrigir falhas de segurança descobertas","Para ter mais anúncios"],"a":1,"e":"Cada atualização tapa buracos que os piratas podiam usar.","t":"Software"},
- {"q":"Um site mostra um aviso de cookies. O mais prudente é…","o":["Aceitar tudo sem ler","Ler e escolher só os necessários","Fechar o computador"],"a":1,"e":"Os cookies de publicidade seguem o que fazes. Aceita só o essencial.","t":"Navegar"},
- {"q":"A navegação privada (anónima) do navegador…","o":["Torna-te invisível para toda a gente","Não guarda o histórico neste dispositivo, mas não te torna invisível","Protege-te de todos os vírus"],"a":1,"e":"Os sites e a rede continuam a ver a tua atividade.","t":"Navegar"},
- {"q":"Achas que clicaste numa ligação suspeita. O que fazes?","o":["Escondo para ninguém saber","Aviso um adulto ou o professor e mudo as palavras-passe","Clico noutra ligação para compensar"],"a":1,"e":"Todos erramos. O importante é avisar depressa para limitar o estrago.","t":"Navegar"},
- {"q":"Numa videochamada de turma, a ligação deve ser partilhada…","o":["Publicamente nas redes sociais","Só com quem deve participar","Com quem pedir"],"a":1,"e":"Ligações públicas deixam entrar intrusos na aula.","t":"Navegar"},
- {"q":"Num jogo, alguém oferece-te \"moedas grátis\" se deres a palavra-passe da conta. O que fazes?","o":["Dou, é só no jogo","Recuso: é uma burla para roubar a conta","Dou a palavra-passe de outra conta"],"a":1,"e":"Nunca dês a palavra-passe, nem no jogo.","t":"Jogos online"},
- {"q":"Um jogo pede o cartão dos teus pais para \"desbloquear prémios\". O que fazes?","o":["Uso o cartão sem avisar","Falo com os meus pais antes de qualquer compra","Escrevo os números no chat"],"a":1,"e":"Compras precisam sempre da autorização de um adulto.","t":"Jogos online"},
- {"q":"Alguém insulta-te no chat do jogo. O melhor é…","o":["Responder com mais insultos","Silenciar ou bloquear, denunciar e contar a um adulto","Combinar encontro com a pessoa"],"a":1,"e":"Bloquear e denunciar protege-te a ti e aos outros jogadores.","t":"Jogos online"},
- {"q":"Qual é o nome de utilizador mais seguro num jogo?","o":["O meu nome completo e a escola","Um nome inventado, sem dados pessoais","O meu número de telemóvel"],"a":1,"e":"Um nome inventado não revela quem és nem onde moras.","t":"Jogos online"},
- {"q":"Vês uma notícia chocante partilhada por muita gente. Antes de partilhares…","o":["Partilho logo, toda a gente está a partilhar","Confirmo em fontes fiáveis e vejo quem a escreveu","Acredito se tiver imagens"],"a":1,"e":"Partilhar notícias falsas ajuda-as a espalhar-se.","t":"Notícias falsas"},
- {"q":"Hoje, fotografias e vídeos podem ser alterados ou criados por inteligência artificial. Isso quer dizer que…","o":["Tudo o que vejo é verdade","Devo confirmar a origem antes de acreditar","Só os vídeos podem ser falsos"],"a":1,"e":"Imagens convincentes também podem ser falsas.","t":"Notícias falsas"},
- {"q":"Uma notícia sem autor, sem data e sem fonte é…","o":["Mais fiável","Um sinal de alerta","Igual às outras"],"a":1,"e":"Notícias sérias dizem quem escreveu, quando e com que fontes.","t":"Notícias falsas"},
- {"q":"O que é a \"engenharia social\"?","o":["Enganar pessoas para revelarem dados, em vez de \"partir\" computadores","Construir pontes","Programar jogos"],"a":0,"e":"É mais fácil enganar uma pessoa do que invadir um computador.","t":"Burlas"},
- {"q":"Podes copiar uma imagem da internet e usá-la no teu trabalho como se fosse tua?","o":["Sim, está na internet","Não: devo indicar a fonte e ver se a posso usar","Só se mudar a cor"],"a":1,"e":"Quem cria uma imagem tem direitos sobre ela. Cita sempre a fonte.","t":"Direitos de autor"}];
-const QUIZ=QUIZ_BASE.concat(QUIZ_NEW);
+const QUIZ=[{"q":"A tua avó recebe um WhatsApp: «Olá mãe, mudei de número, guarda este.» Logo a seguir pedem-lhe dinheiro com urgência. O que deve ela fazer?","o":["Transferir já, deve ser alguém da família","Ligar para o número antigo ou falar com a pessoa antes de enviar dinheiro","Pedir mais detalhes por mensagem e depois transferir"],"a":1,"e":"É a burla do «Olá mãe, mudei de número»: fingem ser um familiar. Confirma sempre por outra via.","t":"Burlas em Portugal","l":"Enganar alguém para lhe ficar com o dinheiro pode ser crime de burla (Código Penal, art. 217.º)."},
+ {"q":"Chega um SMS: «A sua encomenda dos CTT está retida. Pague 1,99 € de taxa aqui.» Não esperavas nenhuma encomenda. O que fazes?","o":["Pago, é só 1,99 €","Não clico: só sigo encomendas nos canais oficiais dos CTT","Reencaminho a ligação aos amigos, para avisar"],"a":1,"e":"O valor pequeno é a isca: o objetivo é roubar os dados do teu cartão.","t":"Burlas em Portugal"},
+ {"q":"No Instagram, alguém vende bilhetes para um concerto esgotado a metade do preço. Só aceita MB WAY e tem muita pressa. O mais provável é…","o":["Uma sorte de principiante","Uma burla","Os preços baixam sempre antes do concerto"],"a":1,"e":"Bilhetes de eventos esgotados são uma isca clássica. Compra só em vendedores oficiais.","t":"Burlas em Portugal"},
+ {"q":"Uma página diz que um supermercado conhecido oferece um cheque de 500 € a quem partilhar e preencher um formulário. O que é?","o":["Um prémio verdadeiro, já partilharam mil pessoas","Uma burla para recolher dados pessoais","Um concurso aprovado pela Câmara"],"a":1,"e":"Sorteios falsos usam nomes de marcas conhecidas. Confirma sempre na página oficial da marca.","t":"Burlas em Portugal"},
+ {"q":"Alguém liga: «Somos do seu banco, detetámos movimentos suspeitos. Diga-nos o código que lhe enviámos por SMS.» O que fazes?","o":["Dou o código para proteger a conta","Desligo e ligo eu para o número que está atrás do cartão","Pergunto quanto dinheiro tenho na conta"],"a":1,"e":"Os bancos não pedem códigos nem PIN por telefone. Desliga e liga tu para o número oficial.","t":"Burlas em Portugal"},
+ {"q":"Um «investidor» no TikTok promete duplicar em 1 semana o dinheiro que lhe enviares. O que fazes?","o":["Envio 20 € só para experimentar","Desconfio: ninguém garante lucros rápidos e sem risco","Peço dinheiro emprestado para investir mais"],"a":1,"e":"Promessas de dinheiro fácil e rápido são o sinal número um de burla.","t":"Burlas em Portugal"},
+ {"q":"Vês um apartamento de férias no Algarve muito barato. O «dono» pede já um sinal por transferência e não deixa ver nem ligar. Isto é sinal de…","o":["Um negócio fantástico","Possível burla de alojamento falso","Simpatia do proprietário"],"a":1,"e":"Preço baixo, pressa e nenhum contacto real: confirma o alojamento por fontes oficiais antes de pagar.","t":"Burlas em Portugal"},
+ {"q":"Recebes um e-mail «das Finanças» a dizer que tens um reembolso de IRS e que deves clicar numa ligação para o receber. O que fazes?","o":["Clico, quero o dinheiro!","Não clico: entro no Portal das Finanças escrevendo eu o endereço","Respondo com o NIF e o IBAN"],"a":1,"e":"Falsos reembolsos são um clássico. Entra sempre nos sites oficiais pelo teu navegador.","t":"Burlas em Portugal"},
+ {"q":"Dizem-te que ganhaste um telemóvel e, para o receberes, pedem fotografias do Cartão de Cidadão e do cartão bancário. O que fazes?","o":["Envio, pode ser verdade","Recuso: nunca se enviam estas fotografias a desconhecidos","Envio só o Cartão de Cidadão"],"a":1,"e":"Com essas imagens podem pedir créditos ou abrir contas em teu nome.","t":"Burlas em Portugal","l":"Os teus dados pessoais estão protegidos pelo RGPD."},
+ {"q":"Vendes uma bicicleta no OLX. O «comprador» pede o teu telemóvel «para pagar por MB WAY». Para receberes dinheiro, o que tens de dar?","o":["O PIN do MB WAY, para ele confirmar","Só o teu número de telemóvel associado ao MB WAY","O código que chegou por SMS"],"a":1,"e":"Para receber dinheiro por MB WAY basta o teu número. Nunca precisas de PIN nem de códigos.","t":"MB WAY e dinheiro","l":"A PSP e o Banco de Portugal avisam: receber dinheiro por MB WAY nunca exige o teu PIN."},
+ {"q":"Esperas receber 85 € de uma venda, mas o telemóvel mostra um pedido para PAGARES 85 €. O que fazes?","o":["Aceito, deve ser engano da app","Recuso: quem recebe não paga, é uma burla","Aceito e depois peço o dinheiro de volta"],"a":1,"e":"Os burlões usam «Pedir dinheiro» em vez de «Enviar dinheiro». Lê sempre o ecrã antes de aceitar.","t":"MB WAY e dinheiro","l":"Alerta do Banco de Portugal sobre burlas em plataformas como o OLX e o Vinted."},
+ {"q":"Um desconhecido envia-te dinheiro «por engano» por MB WAY e pede que o devolvas já. O mais prudente é…","o":["Devolver já, para ser simpático","Falar primeiro com o teu banco","Gastar, porque o dinheiro já é teu"],"a":1,"e":"Pode fazer parte de uma burla. Não faças nada sem falares com o banco.","t":"MB WAY e dinheiro"},
+ {"q":"Vais criar o PIN do MB WAY. Qual é a melhor escolha?","o":["A minha data de nascimento","Um número que ninguém adivinha e que não partilho","O mesmo PIN do telemóvel do meu irmão"],"a":1,"e":"Evita datas e sequências óbvias, e nunca partilhes o PIN.","t":"MB WAY e dinheiro"},
+ {"q":"Perdeste o telemóvel com o MB WAY instalado. Qual é o primeiro passo?","o":["Esperar uns dias para ver se aparece","Contactar logo o banco para bloquear o MB WAY e os cartões","Mudar o fundo de ecrã"],"a":1,"e":"Quanto mais depressa bloqueares, menos risco corres.","t":"MB WAY e dinheiro"},
+ {"q":"Caíste numa burla e fizeste uma transferência. Qual é o melhor passo seguinte?","o":["Esconder, tenho vergonha","Contactar o banco de imediato e apresentar queixa","Esperar que o burlão devolva"],"a":1,"e":"Agir depressa aumenta a hipótese de travar o estrago. Guarda mensagens e comprovativos.","t":"MB WAY e dinheiro","l":"Podes apresentar queixa na PSP, na GNR ou na Polícia Judiciária."},
+ {"q":"Descobres a palavra-passe do Instagram de um colega e entras na conta dele «só para ver». Em Portugal, isto…","o":["É só uma brincadeira","Pode ser crime de acesso ilegítimo","Só é crime se fores adulto"],"a":1,"e":"Entrar na conta de alguém sem autorização não é brincadeira.","t":"A lei e tu","l":"Lei do Cibercrime (Lei n.º 109/2009), art. 6.º: acesso ilegítimo."},
+ {"q":"Tens 14 anos e partilhas no grupo da turma um vídeo de um colega a cair, contra a vontade dele. Em Portugal, o que pode acontecer?","o":["Nada, ainda és menor","Pode dar lugar a medidas tutelares educativas","Vais para a prisão como um adulto"],"a":1,"e":"Abaixo dos 16 anos não se é julgado como adulto, mas dos 12 aos 16 aplica-se a Lei Tutelar Educativa.","t":"A lei e tu","l":"Código Penal, art. 199.º (fotografias e gravações ilícitas) e Lei Tutelar Educativa."},
+ {"q":"Tiras uma fotografia a um colega contra a vontade dele, mas não a publicas. Em Portugal, isto…","o":["Nunca é um problema","Pode ser crime","Só é problema se a venderes"],"a":1,"e":"Fotografar ou filmar alguém contra a vontade dessa pessoa pode ser crime, mesmo sem publicar.","t":"A lei e tu","l":"Código Penal, art. 199.º: pena de prisão até 1 ano ou multa até 240 dias."},
+ {"q":"Gravaste uma conversa com um colega sem ele saber e queres mostrá-la à turma. Em Portugal…","o":["Podes, a gravação é tua","Gravar e usar a voz de alguém sem consentimento pode ser crime","Só é crime se o telemóvel for dele"],"a":1,"e":"A privacidade das conversas também é protegida pela lei.","t":"A lei e tu","l":"Código Penal, art. 199.º (gravações ilícitas)."},
+ {"q":"Chamas nomes feios a um colega num grupo de WhatsApp com 30 pessoas. Em Portugal, ofender assim alguém pode ser…","o":["Liberdade de expressão, nunca é crime","Crime de injúria ou de difamação","Só falta de educação"],"a":1,"e":"Insultar e espalhar mentiras sobre alguém pode ser crime, mesmo online.","t":"A lei e tu","l":"Código Penal, art. 180.º (difamação) e art. 181.º (injúria)."},
+ {"q":"Um colega envia-te mensagens a dizer que te vai bater se fores à escola amanhã. Isto pode ser…","o":["Só uma piada","Crime de ameaça","Normal entre colegas"],"a":1,"e":"Ameaçar alguém com violência é grave. Guarda as mensagens e conta a um adulto.","t":"A lei e tu","l":"Código Penal, art. 153.º (ameaça)."},
+ {"q":"Descarregas de graça, num site pirata, um filme que acabou de estrear. Em Portugal, isso…","o":["É sempre permitido","Viola direitos de autor e pode trazer vírus","Só é ilegal se pagares"],"a":1,"e":"Quem cria filmes e música tem direitos. Os sites piratas escondem muitas vezes vírus.","t":"A lei e tu","l":"Código do Direito de Autor e dos Direitos Conexos."},
+ {"q":"Entras sem autorização na rede da escola para ver os testes antes da hora, sem alterar nada. Isto é…","o":["Uma proeza inofensiva","Acesso ilegítimo a um sistema informático","Permitido, se não mudares nada"],"a":1,"e":"Mesmo sem estragar nada, entrar onde não tens autorização pode ser crime.","t":"A lei e tu","l":"Lei do Cibercrime (Lei n.º 109/2009), art. 6.º."},
+ {"q":"A partir de que idade se pode ser responsabilizado criminalmente como um adulto, em Portugal?","o":["12 anos","16 anos","18 anos"],"a":1,"e":"Abaixo dos 16 anos não se é julgado como adulto. Dos 12 aos 16 aplica-se a Lei Tutelar Educativa.","t":"A lei e tu","l":"Código Penal, art. 19.º: os menores de 16 anos são inimputáveis."},
+ {"q":"Partilhas no grupo da turma uma fotografia íntima de uma colega que ela enviou só a ti. Isto é…","o":["Seguro, foi ela que ta enviou","Muito grave e pode ser crime","Só é grave se ela descobrir"],"a":1,"e":"Partilhar imagens íntimas de alguém destrói vidas. Quem partilha é que faz mal, nunca quem as enviou.","t":"A lei e tu","l":"Código Penal, art. 199.º e, quando há menores, art. 176.º (pornografia de menores)."},
+ {"q":"Uma app guardou fotografias tuas e já não queres que as tenha. Ao abrigo do RGPD, podes…","o":["Nada, ficam lá para sempre","Pedir o apagamento dos teus dados","Pagar para as apagarem"],"a":1,"e":"O RGPD dá-te direitos: ver, corrigir e pedir o apagamento dos teus dados pessoais.","t":"A lei e tu","l":"RGPD, art. 17.º (direito ao apagamento)."},
+ {"q":"Se achas que uma empresa não trata bem os teus dados pessoais, em Portugal podes queixar-te à…","o":["CNPD (Comissão Nacional de Proteção de Dados)","Liga Portuguesa de Futebol","Direção-Geral das Artes"],"a":0,"e":"A CNPD é a autoridade que fiscaliza a proteção de dados em Portugal.","t":"A lei e tu"},
+ {"q":"Criar um vírus para estragar os ficheiros de outra pessoa pode ser punido, em Portugal, como…","o":["Dano informático (Lei do Cibercrime)","Excesso de velocidade","Nada, se o vírus for pequeno"],"a":0,"e":"Estragar dados ou programas de outras pessoas é crime, mesmo que seja «só um bocadinho».","t":"A lei e tu","l":"Lei do Cibercrime (Lei n.º 109/2009), art. 4.º."},
+ {"q":"Instalas uma app no telemóvel de um colega para ler em segredo as mensagens dele. Isto…","o":["É só curiosidade","Pode ser crime","Só é crime se fores adulto"],"a":1,"e":"Espiar as mensagens de alguém invade a sua vida privada.","t":"A lei e tu","l":"Lei do Cibercrime (Lei n.º 109/2009), arts. 6.º e 7.º."},
+ {"q":"O e-mail «dos CTT» vem de ctt-encomendas@gmail.com. Uma grande empresa a sério usaria…","o":["O seu próprio domínio, e não um endereço gratuito","Qualquer endereço serve","Só letras minúsculas"],"a":0,"e":"Grandes empresas usam o seu endereço oficial. Um endereço gratuito é sinal de alerta.","t":"Phishing"},
+ {"q":"O «site do banco» tem o endereço banc0-seguro.net (com zero em vez de «o»). O que significa?","o":["É só um erro de escrita","É um site falso a imitar o verdadeiro","É a versão para telemóvel"],"a":1,"e":"Letras trocadas por números são um truque para enganar o olho.","t":"Phishing"},
+ {"q":"O phishing por SMS chama-se «smishing». E por chamada telefónica?","o":["Vishing","Fishing","Hashing"],"a":0,"e":"«Vishing» vem de «voice» (voz): burlões que ligam a fingir que são do banco ou da polícia.","t":"Phishing"},
+ {"q":"Clicaste numa ligação suspeita e escreveste lá a palavra-passe. O que fazes primeiro?","o":["Mudo logo essa palavra-passe e aviso um adulto","Espero para ver o que acontece","Apago a app e esqueço o assunto"],"a":0,"e":"Todos podemos errar. O importante é agir depressa e pedir ajuda.","t":"Phishing"},
+ {"q":"Um e-mail do «professor» traz um anexo estranho e erros de português. O que fazes?","o":["Abro, pode ser um teste surpresa","Não abro e confirmo com o professor pessoalmente","Reencaminho à turma toda"],"a":1,"e":"Anexos inesperados podem esconder vírus. Confirma por outra via.","t":"Phishing"},
+ {"q":"Qual é um sinal típico de mensagem de phishing?","o":["Cria pressa e ameaça fechar a tua conta","Tem o teu nome","Chegou de manhã"],"a":0,"e":"Os burlões criam pressa para não teres tempo de pensar.","t":"Phishing"},
+ {"q":"Qual destas palavras-passe é a mais forte?","o":["futebol2010","S3mpre-a-Cantar-no-Duche!","12345678"],"a":1,"e":"Uma frase longa, com símbolos e números, vale mais do que uma palavra simples.","t":"Palavras-passe"},
+ {"q":"O teu melhor amigo pede-te a palavra-passe do jogo «para te ajudar a subir de nível». O que fazes?","o":["Dou, é meu amigo","Não dou: posso ajudar a jogar sem partilhar a palavra-passe","Dou só uma parte"],"a":1,"e":"A palavra-passe é só tua. Se a contas, a conta deixa de ser só tua.","t":"Palavras-passe"},
+ {"q":"Onde NÃO deves escrever a tua palavra-passe?","o":["Num papel colado ao portátil, à vista de todos","No campo de palavra-passe do site oficial","Num gestor de palavras-passe"],"a":0,"e":"Quem passar vê. Se precisares, guarda-as num gestor de palavras-passe.","t":"Palavras-passe"},
+ {"q":"A autenticação em dois passos serve para…","o":["Teres duas contas iguais","Pedir uma segunda prova, além da palavra-passe","Mudares a palavra-passe duas vezes"],"a":1,"e":"Mesmo que roubem a palavra-passe, falta a segunda confirmação.","t":"Palavras-passe"},
+ {"q":"Usaste a mesma palavra-passe em 5 sites e um deles foi invadido. O que deves fazer?","o":["Nada, os outros estão bem","Mudar a palavra-passe em todos, com palavras-passe diferentes","Esperar um mês"],"a":1,"e":"Os piratas experimentam a mesma palavra-passe noutros sites.","t":"Palavras-passe"},
+ {"q":"Num computador partilhado da escola, o melhor é…","o":["Guardar a palavra-passe no navegador, é mais fácil","Não guardar e terminar sempre a sessão","Dizer aos colegas para usarem a minha conta"],"a":1,"e":"Quem usar o computador a seguir pode entrar nas tuas contas.","t":"Palavras-passe"},
+ {"q":"A Chave Móvel Digital serve para te identificares online nos serviços do Estado. O PIN dela é…","o":["Para dar a quem pedir ajuda","Pessoal e secreto, como o PIN do cartão do banco","Igual ao número do Cartão de Cidadão"],"a":1,"e":"Quem tiver o PIN pode fazer-se passar por ti.","t":"Palavras-passe"},
+ {"q":"Num vídeo teu no TikTok vê-se a tua camisola da escola e a tua casa ao fundo. O que podes estar a revelar?","o":["Nada importante","Onde estudas e onde moras","A tua cor favorita"],"a":1,"e":"Pequenos pormenores juntos mostram muito sobre ti.","t":"Privacidade e RGPD"},
+ {"q":"Um jogo pede acesso à localização, aos contactos e ao microfone. O mais sensato é…","o":["Aceitar tudo","Dar só as permissões de que o jogo precisa","Desinstalar o telemóvel"],"a":1,"e":"Pergunta-te: este jogo precisa mesmo disto para funcionar?","t":"Privacidade e RGPD"},
+ {"q":"Um site pede-te o NIF, a morada e o Cartão de Cidadão só para veres um vídeo. O que fazes?","o":["Dou tudo, é rápido","Desconfio: só devem pedir os dados de que precisam","Dou só o NIF"],"a":1,"e":"Pedir mais dados do que o necessário é um mau sinal.","t":"Privacidade e RGPD","l":"RGPD: as entidades só podem pedir os dados necessários (minimização)."},
+ {"q":"Antes de publicares uma fotografia de grupo da turma, o que deves fazer?","o":["Perguntar a quem aparece se concorda","Publicar já, para ter gostos","Marcar toda a gente sem avisar"],"a":0,"e":"Cada pessoa decide se aparece nas fotografias.","t":"Privacidade e RGPD","l":"Código Civil, art. 79.º: o retrato de uma pessoa não pode ser divulgado sem o seu consentimento."},
+ {"q":"Ter a localização em tempo real ligada nas redes sociais pode…","o":["Mostrar onde estás neste momento","Poupar bateria","Melhorar as fotografias"],"a":0,"e":"Desliga a localização nas publicações. Nem toda a gente que te segue é de confiança.","t":"Privacidade e RGPD"},
+ {"q":"O que acontece ao que publicas na internet?","o":["Desaparece passado um dia","Pode ser guardado e copiado, mesmo que apagues","Só tu o podes ver"],"a":1,"e":"Pensa antes de publicar: na internet, quase nada se apaga por completo.","t":"Privacidade e RGPD"},
+ {"q":"Uma conta com foto de adolescente pede-te amizade e já sabe o nome da tua escola. O que fazes?","o":["Aceito, parece da minha idade","Bloqueio e conto a um adulto: pode não ser quem diz","Respondo a perguntar quem é"],"a":1,"e":"Qualquer pessoa pode usar fotos falsas.","t":"Redes sociais"},
+ {"q":"Um «influencer» diz: «Clica já e ganha 1000 € por dia a partir de casa.» Antes de acreditares, o que fazes?","o":["Pesquiso e desconfio de promessas fáceis de dinheiro","Partilho com os amigos","Envio já os meus dados"],"a":0,"e":"Se fosse assim tão fácil, toda a gente já estava rica.","t":"Redes sociais"},
+ {"q":"No grupo da turma alguém começa a partilhar fotografias de um colega para gozar. A melhor reação é…","o":["Pôr emojis a rir","Não reencaminhar, falar com um professor e apoiar o colega","Guardar as fotografias"],"a":1,"e":"Quem partilha também faz parte do problema.","t":"Redes sociais"},
+ {"q":"Os teus seguidores perguntam onde moras. A resposta mais segura é…","o":["A morada completa, são só seguidores","Não digo: não partilho a minha morada online","Só o nome da rua"],"a":1,"e":"Não precisas de dizer onde moras a ninguém online.","t":"Redes sociais"},
+ {"q":"Um desafio perigoso do TikTok anda a espalhar-se na escola. O que fazes?","o":["Participo, para não ficar de fora","Não participo e aviso um adulto","Dou gostos mas não participo"],"a":1,"e":"Desafios perigosos já causaram acidentes graves. Ser corajoso é dizer não.","t":"Redes sociais"},
+ {"q":"Alguém no Instagram diz que é do apoio à conta e pede o teu código de login. O que fazes?","o":["Dou, quero a conta segura","Não dou: o apoio verdadeiro nunca pede códigos","Dou metade do código"],"a":1,"e":"Códigos de verificação são só teus. Nunca os dês.","t":"Redes sociais"},
+ {"q":"Alguém criou um perfil falso com o teu nome e as tuas fotografias para gozar contigo. O que fazes?","o":["Ignoro e escondo de toda a gente","Guardo provas, denuncio o perfil e conto a um adulto","Faço um perfil falso dele também"],"a":1,"e":"Capturas de ecrã e uma denúncia ajudam a resolver o problema.","t":"Ciberbullying","l":"A Linha Internet Segura (800 21 90 90) dá apoio gratuito e confidencial."},
+ {"q":"O ciberbullying só acontece na escola?","o":["Sim, só durante as aulas","Não, pode acontecer a qualquer hora, por isso falar é tão importante","Só ao fim de semana"],"a":1,"e":"Está no telemóvel, por isso pode seguir-te para casa. Há sempre ajuda.","t":"Ciberbullying","l":"Linha Internet Segura: 800 21 90 90 (gratuita e confidencial)."},
+ {"q":"Um amigo está triste por causa de mensagens maldosas. Como o podes ajudar?","o":["Dizer-lhe para ignorar e esquecer","Ouvi-lo, ficar do lado dele e ajudá-lo a contar a um adulto","Gozar também, para ele se habituar"],"a":1,"e":"Um amigo a ouvir faz a diferença.","t":"Ciberbullying"},
+ {"q":"Se «gostares» ou partilhares uma publicação que humilha alguém…","o":["Ajudas a magoar mais a pessoa","Não faz diferença","Mostras que és divertido"],"a":0,"e":"Cada partilha aumenta o alcance da humilhação.","t":"Ciberbullying"},
+ {"q":"Há uma linha gratuita em Portugal para crianças e jovens que precisam de ajuda. Qual é o número?","o":["116 111 (SOS Criança)","808 24 24 24","1234"],"a":0,"e":"A Linha SOS Criança é gratuita e confidencial.","t":"Pedir ajuda","l":"SOS Criança, do Instituto de Apoio à Criança: 116 111."},
+ {"q":"Se alguém estiver em perigo imediato, qual é o número de emergência em Portugal?","o":["112","116 006","800 21 90 90"],"a":0,"e":"112 é para emergências. 116 006 é o apoio à vítima e 800 21 90 90 é a Linha Internet Segura.","t":"Pedir ajuda"},
+ {"q":"A APAV (Associação Portuguesa de Apoio à Vítima) tem uma linha de apoio a quem foi vítima de crime. O número é…","o":["116 006","112","144"],"a":0,"e":"O apoio da APAV é gratuito e confidencial.","t":"Pedir ajuda","l":"Linha de Apoio à Vítima da APAV: 116 006."},
+ {"q":"Quando algo corre mal online, qual é a melhor atitude?","o":["Contar logo a um adulto de confiança","Esperar que passe","Apagar tudo e não dizer nada"],"a":0,"e":"Pedir ajuda é de quem é esperto. Quanto mais cedo, melhor.","t":"Pedir ajuda"},
+ {"q":"Quem pode denunciar conteúdos ilegais na internet, em Portugal?","o":["Qualquer pessoa, por exemplo através da Linha Internet Segura","Só a polícia","Só um advogado"],"a":0,"e":"Todos podemos ajudar a tornar a internet mais segura.","t":"Pedir ajuda","l":"Linha Internet Segura: 800 21 90 90."},
+ {"q":"Deixas o telemóvel desbloqueado na mesa do café. O que pode acontecer?","o":["Nada, ninguém repara","Alguém pode ver ou usar as tuas contas","O telemóvel carrega-se sozinho"],"a":1,"e":"Usa sempre bloqueio com PIN ou impressão digital.","t":"Telemóvel e dispositivos"},
+ {"q":"O que é o IMEI do telemóvel?","o":["O código único do aparelho, útil se for roubado","O número da tua casa","A palavra-passe do Wi-Fi"],"a":0,"e":"Escreve *#06# no teclado do telefone para o ver e guarda-o.","t":"Telemóvel e dispositivos","l":"Se te roubarem o telemóvel, avisa o operador e apresenta queixa."},
+ {"q":"Estás num café com Wi-Fi grátis chamado «Cafe_Free_WiFi_2». Para ires ao banco online…","o":["Uso os dados móveis em vez dessa rede","Uso essa rede, é grátis","Peço ao vizinho que entre por mim"],"a":0,"e":"Redes abertas podem ser espiadas. Para o banco, usa os dados móveis.","t":"Telemóvel e dispositivos"},
+ {"q":"Antes de ofereceres o teu telemóvel antigo, deves…","o":["Fazer reposição de fábrica e remover as contas","Só desligá-lo","Colar uma etiqueta"],"a":0,"e":"Senão, quem o receber pode ver as tuas fotos e mensagens.","t":"Telemóvel e dispositivos"},
+ {"q":"Uma pessoa desconhecida oferece-se para carregar o teu telemóvel «ligado ao computador dela». O mais seguro é…","o":["Recusar e carregar só com o teu carregador numa tomada","Aceitar, é rápido","Dar também o PIN"],"a":0,"e":"Ligar o telemóvel a aparelhos desconhecidos pode pôr os teus dados em risco.","t":"Telemóvel e dispositivos"},
+ {"q":"Uma mensagem diz «a tua app precisa de atualização, clica aqui». Como atualizas as apps com segurança?","o":["Pela loja oficial (Google Play ou App Store)","Por uma ligação de SMS","Num site que prometa apps grátis"],"a":0,"e":"As lojas oficiais verificam as apps.","t":"Telemóvel e dispositivos"},
+ {"q":"Compraste umas sapatilhas online e não gostaste. Em Portugal, podes devolvê-las sem dar explicações em…","o":["14 dias","24 horas","6 meses"],"a":0,"e":"É o direito de livre resolução: 14 dias depois de receberes. Há exceções, como produtos feitos por medida.","t":"Compras online","l":"Decreto-Lei n.º 24/2014."},
+ {"q":"A loja online não resolve o teu problema. Podes fazer uma reclamação através do…","o":["Livro de Reclamações Eletrónico","Livro de Receitas","Livro de Ponto"],"a":0,"e":"É gratuito. Nem todas as lojas estrangeiras estão abrangidas, por isso confirma antes de comprar.","t":"Compras online","l":"Muitas empresas em Portugal têm de disponibilizar o Livro de Reclamações."},
+ {"q":"Antes de comprares num site que não conheces, o que verificas?","o":["Contactos, morada, condições de devolução e opiniões fora do site","Só se o preço é baixo","Se tem muitas cores"],"a":0,"e":"Sites sérios mostram quem são e como podes falar com eles.","t":"Compras online"},
+ {"q":"Uma «loja» só aceita transferência para uma conta de pessoa particular e não mostra morada. Isto é sinal de…","o":["Confiança","Burla provável","Pagamento mais rápido"],"a":1,"e":"Lojas a sério identificam-se e têm formas de pagamento seguras.","t":"Compras online"},
+ {"q":"No Roblox, alguém diz que te dá skins grátis se fizeres login com a tua conta num site. Isto é…","o":["Uma prenda","Uma burla para roubar a tua conta","Uma regra do jogo"],"a":1,"e":"Sites a pedir o teu login «para ofertas» são armadilhas.","t":"Jogos online"},
+ {"q":"Alguém no chat do jogo pede o teu número para continuarem a falar no WhatsApp. O que fazes?","o":["Dou, parece simpático","Recuso e, se insistir, bloqueio e conto a um adulto","Dou o número do meu irmão"],"a":1,"e":"Não dês contactos a quem só conheces do jogo.","t":"Jogos online"},
+ {"q":"O jogo tem «caixas de recompensa» pagas, onde pagas sem saber o que sai. O que deves fazer?","o":["Gastar o que tiver","Falar com um adulto antes de gastar dinheiro real","Usar o cartão dos pais às escondidas"],"a":1,"e":"Gastos pequenos somam-se depressa. Combina regras em casa.","t":"Jogos online"},
+ {"q":"No chat de voz, alguém ofende-te. O melhor é…","o":["Responder a gritar","Silenciar, denunciar o jogador e continuar com os amigos","Combinar encontrar-te com ele"],"a":1,"e":"Silenciar e denunciar protege-te a ti e aos outros jogadores.","t":"Jogos online"},
+ {"q":"Uma notícia diz que «amanhã não há aulas em todo o país» e vem de uma página que ninguém conhece. O que fazes?","o":["Partilho já","Verifico no site da escola ou do Ministério da Educação","Acredito porque tem muitos gostos"],"a":1,"e":"Confirma sempre na fonte oficial antes de partilhar.","t":"Notícias falsas e IA"},
+ {"q":"Um vídeo mostra uma figura pública a dizer uma coisa absurda, mas a voz soa estranha. Hoje isso pode ser…","o":["Sempre verdade","Um deepfake criado com inteligência artificial","Um erro da internet"],"a":1,"e":"Vozes e vídeos podem ser falsificados. Procura a fonte original.","t":"Notícias falsas e IA"},
+ {"q":"Uma fotografia «de ontem» mostra uma inundação, mas é de há 5 anos noutro país. Como podes descobrir?","o":["Fazendo uma pesquisa inversa da imagem","Ampliando a imagem","Perguntando a um colega"],"a":0,"e":"A pesquisa inversa mostra onde a imagem apareceu primeiro.","t":"Notícias falsas e IA"},
+ {"q":"Antes de partilhares uma notícia que te deixou zangado(a), o que deves fazer?","o":["Respirar e confirmar noutras fontes","Partilhar logo para avisar","Comentar com insultos"],"a":0,"e":"As notícias falsas jogam com as emoções para se espalharem.","t":"Notícias falsas e IA"},
+ {"q":"Qual destes é um sinal de que uma notícia pode ser falsa?","o":["Título em maiúsculas a gritar e sem fonte","Autor e data identificados","Várias fontes oficiais citadas"],"a":0,"e":"Notícias a sério dizem quem escreveu, quando e com que fontes.","t":"Notícias falsas e IA"},
+ {"q":"A inteligência artificial pode escrever textos. Num trabalho da escola, o correto é…","o":["Copiar e dizer que fui eu","Dizer que usei IA e confirmar o que ela escreveu","Pedir à IA que invente fontes"],"a":1,"e":"A IA engana-se. Tens de verificar e ser honesto sobre o que usaste.","t":"Notícias falsas e IA"},
+ {"q":"Para usares uma imagem num trabalho de grupo, o mais correto é…","o":["Escolher imagens com licença que permita o uso e indicar a fonte","Usar a primeira que aparece","Tirar a marca de água"],"a":0,"e":"Muitas imagens têm licenças (como Creative Commons) que explicam como as podes usar.","t":"Direitos de autor","l":"Código do Direito de Autor e dos Direitos Conexos."},
+ {"q":"A música que usas num vídeo que publicas pode ter direitos de autor?","o":["Sim, e a plataforma pode retirar o vídeo","Não, a música é sempre livre","Só se for em inglês"],"a":0,"e":"Quem cria a música tem direitos sobre ela.","t":"Direitos de autor","l":"Código do Direito de Autor e dos Direitos Conexos."}];
 /* as perguntas já feitas ficam guardadas: não repetem entre jogos até saírem todas */
-const LS_QSEEN='vb_tetris_qseen_v2';
+const LS_QSEEN='vb_tetris_qseen_v3';
 function qSeenLoad(){ try{ const a=JSON.parse(localStorage.getItem(LS_QSEEN)||'[]'); return Array.isArray(a)?a.filter(n=>Number.isInteger(n)&&n>=0&&n<QUIZ.length):[]; }catch(e){ return []; } }
 let qUsed=qSeenLoad(), qLastTheme='', qCur=null, qAnswered=false, qSel=-1, qOpenedAt=0, qAnsweredAt=0;
 const qBox=$('quiz'), qNext=$('qNext');
+/* ═══════════════ PERGUNTAS ACESSÍVEIS ═══════════════ */
+const A11Y_KEY='vb_tetris_a11y';
+let a11y={read:false,big:false,contrast:false,easy:false}, qLastFb='';
+try{ Object.assign(a11y,JSON.parse(localStorage.getItem(A11Y_KEY)||'{}')); }catch(e){}
+const TTS=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);
+let ptVoice=null;
+function pickVoice(){ if(!TTS) return; const vs=speechSynthesis.getVoices(); ptVoice=vs.find(v=>/^pt[-_]PT$/i.test(v.lang))||vs.find(v=>/^pt/i.test(v.lang))||null; }
+if(TTS){ pickVoice(); try{ speechSynthesis.addEventListener('voiceschanged',pickVoice); }catch(e){} }
+function ttsClean(t){
+  return t.replace(/\barts\.\s*/gi,'artigos ').replace(/\bart\.\s*/gi,'artigo ').replace(/n\.º/g,'número').replace(/(\d+)\.º/g,'$1')
+          .replace(/€/g,' euros').replace(/\*#06#/g,'asterisco, cardinal, zero, seis, cardinal').replace(/\s+/g,' ');
+}
+function speakText(t){
+  if(!TTS) return;
+  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(ttsClean(t)); u.lang='pt-PT'; if(ptVoice) u.voice=ptVoice; u.rate=.92; speechSynthesis.speak(u); }catch(e){}
+}
+function stopSpeak(){ if(TTS){ try{ speechSynthesis.cancel(); }catch(e){} } }
+function srSay(t){ const e=$('srStatus'); if(!e) return; e.textContent=''; setTimeout(()=>{ e.textContent=t; },60); }
+function qSpeechText(){ const it=qCur.it; return 'Pergunta. '+it.q+' '+qCur.order.map((k,n)=>'Opção '+(n+1)+'. '+it.o[k]+'.').join(' '); }
+function readNow(){ if(!qCur||!quizOpen) return; speakText(qAnswered?qLastFb:qSpeechText()); }
+function a11yApply(){
+  document.body.classList.toggle('a11y-big',!!a11y.big);
+  document.body.classList.toggle('a11y-contrast',!!a11y.contrast);
+  document.body.classList.toggle('a11y-easy',!!a11y.easy);
+  [['aAuto','read'],['aBig','big'],['aContrast','contrast'],['aEasy','easy']].forEach(([id,k])=>$(id).setAttribute('aria-pressed',a11y[k]?'true':'false'));
+  try{ localStorage.setItem(A11Y_KEY,JSON.stringify(a11y)); }catch(e){}
+}
+[['aAuto','read'],['aBig','big'],['aContrast','contrast'],['aEasy','easy']].forEach(([id,k])=>{
+  $(id).addEventListener('click',()=>{ a11y[k]=!a11y[k]; a11yApply(); if(k==='read'){ if(a11y.read) readNow(); else stopSpeak(); } });
+});
+$('aListen').addEventListener('click',readNow);
+if(!TTS){ $('aListen').classList.add('hidden'); $('aAuto').classList.add('hidden'); }
+a11yApply();
+
 function openQuiz(){
   if(qUsed.length>=QUIZ.length) qUsed=qUsed.slice(-8);   /* recomeça, mas sem repetir já as 8 últimas */
   let pool=[]; for(let k=0;k<QUIZ.length;k++) if(!qUsed.includes(k)) pool.push(k);
@@ -1111,7 +1318,7 @@ function openQuiz(){
   qCur={it,order}; qAnswered=false; quizOpen=true; paused=true;
   qSel=-1; qOpenedAt=performance.now();
   try{ if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); }catch(e){}   // nenhum botão com foco a "roubar" o Espaço/Enter
-  $('qHint').textContent='⌨️ Carrega 1, 2 ou 3 (ou A, B, C) — ou usa ↑ ↓ e Enter';
+  $('qHint').textContent='⌨️ Carrega 1, 2 ou 3 (ou A, B, C) — ou usa ↑ ↓ e Enter'+(TTS?' · L para ouvir':'');
   $('qText').textContent=it.q; $('qFb').textContent=''; qNext.classList.add('hidden');
   const box=$('qOpts'); box.innerHTML='';
   order.forEach((k,n)=>{
@@ -1119,25 +1326,30 @@ function openQuiz(){
     b.textContent=(n+1)+'. '+it.o[k]; b.onclick=()=>answerQuiz(k); box.appendChild(b);
   });
   qBox.classList.remove('hidden'); vbSay('Pergunta! 🧠',2000); vib(20);
+  try{ $('qText').focus({preventScroll:true}); }catch(e){}   // leitores de ecrã começam pela pergunta
+  if(a11y.read) setTimeout(()=>{ if(quizOpen&&!qAnswered) speakText(qSpeechText()); },400);
 }
 function answerQuiz(k){
   if(!qAnswered&&qCur){
     qAnswered=true; qAnsweredAt=performance.now(); const it=qCur.it, right=k===it.a; st.quizTotal++; if(right) st.quizRight++;
-    [...$('qOpts').children].forEach(b=>{ const kk=Number(b.dataset.k); b.disabled=true; if(kk===it.a) b.classList.add('ok'); else if(kk===k) b.classList.add('bad'); });
+    [...$('qOpts').children].forEach(b=>{ const kk=Number(b.dataset.k); b.disabled=true; if(kk===it.a){ b.classList.add('ok'); b.setAttribute('aria-label',b.textContent+' — resposta certa'); } else if(kk===k){ b.classList.add('bad'); b.setAttribute('aria-label',b.textContent+' — a tua resposta, errada'); } });
     if(right){
       qStreak++; const bonus=qStreak>=3?50:0;
       score+=100+bonus; bump(scoreEl); sfxCorrect(qStreak); qCelebrate(100+bonus,qStreak);
-      $('qFb').innerHTML='✅ <strong>Certo! +100 pontos.</strong> '+it.e+(bonus?'<br>🔥 <strong>Sequência de '+qStreak+'! +50 extra</strong>':'');
+      $('qFb').innerHTML='✅ <strong>Certo! +100 pontos.</strong> '+it.e+qLaw(it)+(bonus?'<br>🔥 <strong>Sequência de '+qStreak+'! +50 extra</strong>':'');
       vbSay(bonus?'Sequência de '+qStreak+'! 🔥':['Boa! 🧠','Sabes tudo! 🌟','Esperto! 🤩'][Math.floor(Math.random()*3)],2400); vbDance(bonus?3:2);
     } else {
       qStreak=0; sfxWrong();
-      $('qFb').innerHTML='💡 <strong>Quase!</strong> '+it.e;
+      $('qFb').innerHTML='💡 <strong>Quase!</strong> '+it.e+qLaw(it);
       vbSay('Agora já sabes! 💡',2400); vbSad();
     }
-    $('qHint').textContent='⌨️ Carrega Enter ou Espaço para continuar';
+    qLastFb=(right?'Certo! ':'Quase! ')+it.e+(it.l?' Em Portugal: '+it.l:'');
+    if(a11y.read) speakText(qLastFb);
+    $('qHint').textContent='⌨️ Carrega Enter ou Espaço para continuar'+(TTS?' · L para ouvir':'');
     qNext.classList.remove('hidden'); qNext.focus();
   }
 }
+function qLaw(it){ return it.l?'<div class="q-law">🇵🇹 <strong>Em Portugal:</strong> '+it.l+'</div>':''; }
 function qCelebrate(pts,streak){
   const p=document.createElement('div'); p.className='qplus'; p.textContent='+'+pts+(streak>=3?' 🔥':''); qBox.appendChild(p); setTimeout(()=>p.remove(),1300);
   if(REDUCE) return;
@@ -1157,7 +1369,7 @@ function qSelect(n){
 }
 function closeQuiz(){
   if(!quizOpen||!qAnswered) return;
-  quizOpen=false; paused=false; acc=0; qBox.classList.add('hidden');
+  quizOpen=false; paused=false; acc=0; qBox.classList.add('hidden'); stopSpeak();
 }
 qNext.onclick=closeQuiz;
 
@@ -1190,7 +1402,7 @@ function frame(t){
 /* ═══════════════ OVERLAY E CONTROLOS ═══════════════ */
 let ovShownAt=0;
 function showOverlay(title,html,btn){ ovShownAt=performance.now(); ovTitle.textContent=title; ovText.innerHTML=html; ovBtn.textContent=btn; overlay.classList.remove('hidden'); }
-function hideOverlay(){ overlay.classList.add('hidden'); }
+function hideOverlay(){ overlay.classList.add('hidden'); partyStop(); }
 
 function act(a){
   if(!running||paused||clearing||!piece) return;
@@ -1227,6 +1439,9 @@ window.addEventListener('keydown',e=>{
   if(quizOpen){
     if(e.repeat||e.ctrlKey||e.metaKey||e.altKey) return;
     const kq=e.key.toLowerCase();
+    const ae=document.activeElement, onBtn=ae&&ae.closest&&(ae.closest('#a11yBar')||(!qAnswered&&ae.closest('#qOpts')));
+    if(onBtn&&(kq==='enter'||kq===' ')) return;   // botão com foco (Tab): deixa o clique normal acontecer
+    if(kq==='l'){ e.preventDefault(); readNow(); return; }
     if(!qAnswered){
       const idx=Math.max(['1','2','3'].indexOf(kq), ['a','b','c'].indexOf(kq));   // 1/2/3 ou A/B/C
       const ready=performance.now()-qOpenedAt>450;   // evita respostas sem querer (teclas de jogo ainda carregadas)
@@ -1263,7 +1478,7 @@ function startGame(){
   st.maxCombo=0; st.quizRight=0; st.quizTotal=0; st.ms=0; st.pieces=0;
   parts.length=0; pops.length=0; flashes.length=0; trails.length=0; blooms.length=0; rings.length=0; wellFlash=0; dispScore=0; qStreak=0;
   score=0; level=1; lines=0; dropInterval=intervalFor(1); acc=0; combo=0; pieceCount=0;
-  quizOpen=false; $('quiz').classList.add('hidden'); setTheme(0);
+  quizOpen=false; $('quiz').classList.add('hidden'); setTheme(0); partyStop(); stopSpeak();
   running=true; paused=false; pauseBtn.textContent='⏸ PAUSA';
   hideOverlay(); vbSay('Vamos lá! 🚀',2200); vbJump();
 }
