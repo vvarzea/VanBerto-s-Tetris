@@ -727,7 +727,7 @@ const st={maxCombo:0,quizRight:0,quizTotal:0,ms:0,pieces:0};
 let running=false, paused=false, clearing=null;
 let score=0, level=1, lines=0, dropInterval=720, acc=0, showGhost=true;
 let combo=0, pieceCount=0, quizOpen=false, quizOn=true, dispScore=0, qStreak=0;
-const LS_QUIZ='vb_tetris_quiz', LS_HELP='vb_tetris_help_seen';
+const LS_QUIZ='vb_tetris_quiz', LS_HELP='vb_tetris_help_seen', LS_SAVE='vb_tetris_save_v1';
 try{ if(localStorage.getItem(LS_QUIZ)==='off') quizOn=false; }catch(e){}
 function vib(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
 
@@ -779,7 +779,7 @@ function bump(el){ el.classList.remove('pop'); void el.offsetWidth; el.classList
 function spawnNext(){
   piece=queue.shift(); queue.push(newPiece()); canHold=true;
   if(!valid(0,0)){ gameOver(); return; }
-  pieceCount++; st.pieces++;
+  pieceCount++; st.pieces++; saveGame();
   if(running&&quizOn&&pieceCount%9===0) openQuiz();
 }
 function lockPiece(){
@@ -927,7 +927,7 @@ function partyCount(){
 }
 
 function gameOver(){
-  running=false; piece=null; stopSpeak();
+  running=false; piece=null; stopSpeak(); clearSave();
   const novo=score>bestScore;
   if(novo){ bestScore=score; try{ localStorage.setItem(bestKey(),bestScore); }catch(e){} bestEl.textContent=bestScore; }
   const tier=score>=2500?3:score>=1200?2:score>=400?1:0;
@@ -1479,7 +1479,7 @@ function startGame(){
   parts.length=0; pops.length=0; flashes.length=0; trails.length=0; blooms.length=0; rings.length=0; wellFlash=0; dispScore=0; qStreak=0;
   score=0; level=1; lines=0; dropInterval=intervalFor(1); acc=0; combo=0; pieceCount=0;
   quizOpen=false; $('quiz').classList.add('hidden'); setTheme(0); partyStop(); stopSpeak();
-  running=true; paused=false; pauseBtn.textContent='⏸ PAUSA';
+  running=true; paused=false; resumeMode=false; clearSave(); pauseBtn.textContent='⏸ PAUSA';
   hideOverlay(); vbSay('Vamos lá! 🚀',2200); vbJump();
 }
 function togglePause(){
@@ -1487,6 +1487,55 @@ function togglePause(){
   paused=!paused;
   if(paused){ pauseBtn.textContent='▶ CONTINUAR'; showOverlay('PAUSA','O jogo está em pausa.','▶ CONTINUAR'); }
   else { pauseBtn.textContent='⏸ PAUSA'; hideOverlay(); }
+}
+
+/* ═══════════════ GUARDAR E CONTINUAR ═══════════════ */
+let resumeMode=false;
+function clearSave(){ try{ localStorage.removeItem(LS_SAVE); }catch(e){} }
+function readSave(){
+  try{
+    const s=JSON.parse(localStorage.getItem(LS_SAVE)||'null');
+    if(!s||s.v!==1||!Array.isArray(s.board)||s.board.length!==ROWS||!s.board.every(r=>Array.isArray(r)&&r.length===COLS)) return null;
+    if(!s.piece||!SHAPES[s.piece.k]||!Array.isArray(s.queue)||!s.queue.every(k=>SHAPES[k])) return null;
+    return s;
+  }catch(e){ return null; }
+}
+function hasSave(){ return !!readSave(); }
+function saveGame(){
+  if(!running||!piece||clearing) return;
+  try{
+    localStorage.setItem(LS_SAVE,JSON.stringify({
+      v:1, diff, extra:modeExtra, board,
+      piece:{k:piece.k,x:piece.x,y:piece.y,shape:piece.shape},
+      queue:queue.map(p=>p.k), held, canHold, bag,
+      score, level, lines, combo, pieceCount, qStreak, st:{...st}
+    }));
+  }catch(e){}
+}
+function showResume(s){
+  s=s||readSave(); if(!s){ resumeMode=false; showStart(); return; }
+  resumeMode=true;
+  showOverlay('JOGO GUARDADO','Ficaste em <b>⭐ '+s.score+' pontos</b> · 🧩 nível '+s.level+' · 📏 '+s.lines+' linhas.<br>Queres continuar onde ficaste?<br><small>Para começar de novo, usa ⟳ REINICIAR no menu ☰.</small>','▶ CONTINUAR JOGO');
+}
+function loadGame(){
+  const s=readSave(); resumeMode=false;
+  if(!s){ startGame(); return; }
+  try{
+    ensureAudio();
+    diff=DIFF[s.diff]?s.diff:diff; modeExtra=!!s.extra; applyMode();
+    board=s.board; bag=Array.isArray(s.bag)?s.bag.filter(k=>SHAPES[k]):[];
+    piece=makePiece(s.piece.k); piece.shape=s.piece.shape; piece.x=piece.vx=s.piece.x; piece.y=piece.vy=s.piece.y;
+    queue=s.queue.map(makePiece); held=SHAPES[s.held]?s.held:null; canHold=!!s.canHold;
+    if(!valid(0,0)) throw new Error('save invalido');
+    clearing=null; fallOff=Array(ROWS).fill(0); fallV=Array(ROWS).fill(0);
+    Object.assign(st,{maxCombo:0,quizRight:0,quizTotal:0,ms:0,pieces:0},s.st||{});
+    parts.length=0; pops.length=0; flashes.length=0; trails.length=0; blooms.length=0; rings.length=0; wellFlash=0; qStreak=s.qStreak|0;
+    score=s.score|0; dispScore=score; level=Math.max(1,s.level|0); lines=s.lines|0; combo=s.combo|0; pieceCount=s.pieceCount|0;
+    dropInterval=intervalFor(level); acc=0;
+    quizOpen=false; $('quiz').classList.add('hidden'); setTheme(level-1); partyStop(); stopSpeak();
+    running=true; paused=false; pauseBtn.textContent='⏸ PAUSA';
+    hideOverlay(); vbSay('Bem-vindo de volta! 🎮',2400); vbJump();
+  }catch(e){ console.error('loadGame:',e); clearSave(); startGame(); }
 }
 startBtn.onclick=startGame; resetBtn.onclick=startGame; pauseBtn.onclick=togglePause;
 let nameMode=false, helpMode=false;
@@ -1506,7 +1555,7 @@ function saveName(){
   if(helpSeen()) showStart(); else showHelp();
 }
 function helpSeen(){ try{ return localStorage.getItem(LS_HELP)==='1'; }catch(e){ return true; } }
-function showStart(){ showOverlay('TETRIS','Completa linhas para ganhar pontos!<br>Toca no ecrã, usa os botões ou o teclado.','▶ COMEÇAR'); }
+function showStart(){ if(!running&&!resumeMode&&hasSave()){ showResume(); return; } resumeMode=false; showOverlay('TETRIS','Completa linhas para ganhar pontos!<br>Toca no ecrã, usa os botões ou o teclado.','▶ COMEÇAR'); }
 function showHelp(){
   helpMode=true;
   showOverlay('Como jogar','<div class="help"><div>👆 <b>Toque:</b> topo roda • lados movem • centro desce • duplo toque cai</div><div>⌨️ <b>Teclas:</b> ← → mover • ↑ rodar • ↓ descer • Espaço queda • P pausa • Enter ou Espaço continua</div><div>📦 <b>C</b> guarda a peça na reserva (1 vez por peça)</div><div>📏 Completa linhas para ganhar pontos</div><div>🔥 Linhas seguidas dão combos com bónus</div><div>🧠 Responde às perguntas com 1, 2, 3 (ou A, B, C, ou ↑ ↓ e Enter) para ganhar pontos extra</div></div>','Percebi! ▶');
@@ -1538,11 +1587,12 @@ quizBtn.onclick=()=>{ quizOn=!quizOn; quizBtn.textContent=quizOn?'🧠 PERGUNTAS
 quizBtn.textContent=quizOn?'🧠 PERGUNTAS':'🧠 SEM PERGUNTAS';
 nameIn.addEventListener('keydown',e=>{ e.stopPropagation(); if(e.key==='Enter'){ e.preventDefault(); saveName(); } });
 $('greet').onclick=askName;
-ovBtn.onclick=()=>{ if(nameMode) saveName(); else if(helpMode) closeHelp(); else if(running&&paused) togglePause(); else startGame(); };
-if(!playerName) askName(); else if(!helpSeen()) showHelp(); if(playerName) setTimeout(()=>vbSay('Olá, '+playerName+'! Vamos jogar? 🎮',4000),900);
+ovBtn.onclick=()=>{ if(nameMode) saveName(); else if(helpMode) closeHelp(); else if(resumeMode) loadGame(); else if(running&&paused) togglePause(); else startGame(); };
+if(!playerName) askName(); else if(!helpSeen()) showHelp(); else if(hasSave()) showResume(); if(playerName) setTimeout(()=>vbSay('Olá, '+playerName+'! Vamos jogar? 🎮',4000),900);
 soundBtn.onclick=()=>{ soundOn=!soundOn; soundBtn.innerHTML=(soundOn?'🔊<span class="lbl"> Som</span>':'🔇<span class="lbl"> Sem som</span>'); };
 ghostBtn.onclick=()=>{ showGhost=!showGhost; ghostBtn.textContent=showGhost?'👻 SOMBRA':'👻 SEM SOMBRA'; };
-document.addEventListener('visibilitychange',()=>{ if(document.hidden&&running&&!paused) togglePause(); });
+document.addEventListener('visibilitychange',()=>{ if(document.hidden&&running&&!paused) togglePause(); if(document.hidden) saveGame(); });
+window.addEventListener('pagehide',saveGame);
 
 
 /* ═══════════════ BARRA DE ESTADO (telemóvel) ═══════════════ */
